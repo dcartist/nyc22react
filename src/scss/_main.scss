@@ -2,17 +2,35 @@ body{
 
     background-image: url('../images/photos/construction1blkwhite.jpg');
 }
-
 .main{
+
     min-height: 100vh;
+}
+.intro_main{
     min-width: 99vw;
     display: flex;
     justify-content: center;
     align-items: center;
     text-align: center;
-
-    img {
-        width: 65%;
-        filter: drop-shadow(10px 10px 4px rgba(0, 0, 0, 0.432));
+    flex-direction: column;
+    min-height: 70vh;
+    .intro{
+        // background-color: black;
+        color: white;
+        font-size: 2rem;
+        padding: 25px;
+        .contractor{
+            background-color: black;
+            display: block;
+            padding: 10px;
+            border-radius: 15px;
+            min-width: 400px;
+        }
+        img {
+            width: 75%;
+            filter: drop-shadow(10px 10px 4px rgba(0, 0, 0, 0.432));
+        }
     }
+
+    
 }
