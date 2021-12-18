@@ -135,7 +135,7 @@ function App() {
 
   return (
     <div className="main">
-      <Menubar model={items}/>
+      {/* <Menubar model={items}/> */}
     <div className="intro_main">
       <div className="intro">
       <img src={logo} className="logo"/>
