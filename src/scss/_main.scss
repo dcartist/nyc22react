@@ -15,17 +15,19 @@
     .intro{
         // background-color: black;
         color: white;
-        font-size: 2rem;
         padding: 25px;
         .contractor{
             background-color: black;
             display: block;
-            padding: 10px;
+            padding: 20px;
             border-radius: 15px;
-            min-width: 400px;
+            width: 100vw;
+            p{
+                font-size: 3rem;
+            }
         }
         img {
-            width: 75%;
+            width: 45%;
             filter: drop-shadow(10px 10px 4px rgba(0, 0, 0, 0.432));
         }
     }

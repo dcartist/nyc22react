@@ -2,6 +2,7 @@ import React from 'react'
 import logo from '../../images/logos/nyc29_large_white.png';
 import { Parallax, Background } from "react-parallax";
 import firstBackground from "../../images/photos/construction1blkwhite.jpg"
+import blueprint from "../../images/photos/blueprint.jpg"
 import Nav from "../../components/navigation/IntroNavigation"
 import { StickyNav } from 'react-js-stickynav'
 import 'react-js-stickynav/dist/index.css'
@@ -20,18 +21,19 @@ export default function Intro() {
     return (
         <div>
 <Parallax bgImage={firstBackground} strength={500}>
-      <div style={{ height: '100vh' }}>
+      <div style={{ height: '100vh' }} id="home">
       <div className="intro_main">
       <div className="intro">
       <img src={logo} className="logo"/>
-     <span className="contractor">Contractor Management System Demo</span>
+     <div className="contractor"><p>Contractor Management System Demo</p>
      <StickyNav length='40'><Nav></Nav></StickyNav>
+     </div>
      
       </div>
     </div>
       </div>
     </Parallax>
-<Parallax bgImage={image1} strength={500}>
+<Parallax bgImage={blueprint} strength={500}>
       <div style={{ height: '100vh' }} id="about">
         <div style={insideStyles}>About</div>
       </div>

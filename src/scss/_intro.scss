@@ -4,17 +4,24 @@
     z-index: 2000;
     padding: 20px;
     width: 100%;
+    background: #000;
     // top: 0;
     left: 0;
+  }
+
+  .intro_nav_logo{
+    //   height: auto;
+      width: 120px !important;
   }
   .scrollNav {
     transition: all 0.5s ease-in;
     z-index: 2000;
-    background: #ffffff;
+    background: #000000;
     width: 100%;
-    border-bottom: 1px solid #dddddd;
+    border-bottom: 1px solid #000000;
     top: 0;
     left: 0;
+    
     #navbar{
         li {
           display: inline;
@@ -22,9 +29,16 @@
           margin: 5px 10px;
           a{
               text-decoration: none;
-              color: black;
+              color: rgb(255, 255, 255);
           }
           
+        }
+        .intro_logo_section{
+            display: inline;
+            &img{
+                margin-top: 10px;
+            }
+            // vertical-align: middle;
         }
     }
   }
@@ -36,8 +50,11 @@
             margin: 5px 10px;
             a{
                 text-decoration: none;
-                color:white;
+                color:rgb(255, 255, 255);
             }
             
           }
+          .intro_logo_section{
+            display: none;
+        }
       }
