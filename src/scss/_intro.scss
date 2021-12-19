@@ -15,4 +15,29 @@
     border-bottom: 1px solid #dddddd;
     top: 0;
     left: 0;
+    #navbar{
+        li {
+          display: inline;
+          list-style-type: none;
+          margin: 5px 10px;
+          a{
+              text-decoration: none;
+              color: black;
+          }
+          
+        }
+    }
   }
+
+  #navbar{
+          li {
+            display: inline;
+            list-style-type: none;
+            margin: 5px 10px;
+            a{
+                text-decoration: none;
+                color:white;
+            }
+            
+          }
+      }
