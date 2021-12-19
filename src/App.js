@@ -1,148 +1,22 @@
-import logo from './images/logos/nyc29_large_white.png';
 import './style.scss';
-import { Slider } from 'primereact/slider';
-import { Menubar } from 'primereact/menubar';
+import {Route, Link, Redirect, Switch} from "react-router-dom";
+import Home from "./pages/intro/Intro"
+import About from "./pages/about/About"
 function App() {
-  const items = [
-    {
-       label:'File',
-       icon:'pi pi-fw pi-file',
-       items:[
-          {
-             label:'New',
-             icon:'pi pi-fw pi-plus',
-             items:[
-                {
-                   label:'Bookmark',
-                   icon:'pi pi-fw pi-bookmark'
-                },
-                {
-                   label:'Video',
-                   icon:'pi pi-fw pi-video'
-                },
-
-             ]
-          },
-          {
-             label:'Delete',
-             icon:'pi pi-fw pi-trash'
-          },
-          {
-             separator:true
-          },
-          {
-             label:'Export',
-             icon:'pi pi-fw pi-external-link'
-          }
-       ]
-    },
-    {
-       label:'Edit',
-       icon:'pi pi-fw pi-pencil',
-       items:[
-          {
-             label:'Left',
-             icon:'pi pi-fw pi-align-left'
-          },
-          {
-             label:'Right',
-             icon:'pi pi-fw pi-align-right'
-          },
-          {
-             label:'Center',
-             icon:'pi pi-fw pi-align-center'
-          },
-          {
-             label:'Justify',
-             icon:'pi pi-fw pi-align-justify'
-          },
-
-       ]
-    },
-    {
-       label:'Users',
-       icon:'pi pi-fw pi-user',
-       items:[
-          {
-             label:'New',
-             icon:'pi pi-fw pi-user-plus',
-
-          },
-          {
-             label:'Delete',
-             icon:'pi pi-fw pi-user-minus',
-
-          },
-          {
-             label:'Search',
-             icon:'pi pi-fw pi-users',
-             items:[
-                {
-                   label:'Filter',
-                   icon:'pi pi-fw pi-filter',
-                   items:[
-                      {
-                         label:'Print',
-                         icon:'pi pi-fw pi-print'
-                      }
-                   ]
-                },
-                {
-                   icon:'pi pi-fw pi-bars',
-                   label:'List'
-                }
-             ]
-          }
-       ]
-    },
-    {
-       label:'Events',
-       icon:'pi pi-fw pi-calendar',
-       items:[
-          {
-             label:'Edit',
-             icon:'pi pi-fw pi-pencil',
-             items:[
-                {
-                   label:'Save',
-                   icon:'pi pi-fw pi-calendar-plus'
-                },
-                {
-                   label:'Delete',
-                   icon:'pi pi-fw pi-calendar-minus'
-                },
-
-             ]
-          },
-          {
-             label:'Archieve',
-             icon:'pi pi-fw pi-calendar-times',
-             items:[
-                {
-                   label:'Remove',
-                   icon:'pi pi-fw pi-calendar-minus'
-                }
-             ]
-          }
-       ]
-    },
-    {
-       label:'Quit',
-       icon:'pi pi-fw pi-power-off'
-    }
- ];
+ 
  
 
   return (
     <div className="main">
-      {/* <Menubar model={items}/> */}
-    <div className="intro_main">
-      <div className="intro">
-      <img src={logo} className="logo"/>
-     <span className="contractor">Contractor Management System Demo</span>
-      </div>
-     
-    </div>
+      <Switch>
+      <Route path="/about">
+            <About />
+          </Route>
+
+          <Route path="/">
+            <Home />
+          </Route>
+        </Switch>
     </div>
   );
 }
