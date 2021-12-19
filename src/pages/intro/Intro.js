@@ -4,6 +4,7 @@ import { Parallax, Background } from "react-parallax";
 import firstBackground from "../../images/photos/construction1blkwhite.jpg"
 import blueprint from "../../images/photos/blueprint.jpg"
 import Nav from "../../components/navigation/IntroNavigation"
+import About from "../about/About"
 import { StickyNav } from 'react-js-stickynav'
 import 'react-js-stickynav/dist/index.css'
 
@@ -33,11 +34,10 @@ export default function Intro() {
     </div>
       </div>
     </Parallax>
-<Parallax bgImage={blueprint} strength={500}>
+<Parallax bgImage={blueprint} strength={500} blur={{ min: -1, max: 5 }}>
       <div style={{ height: '100vh' }} id="about">
-        <div style={insideStyles}>
-          <p>NYC22 is a demo application based on the New York Department of Buildings (DOB)'s job application filings. It contains all job applications submitted through the Borough Offices, through eFiling, or the HUB, from January 1, 2000, to 2019.</p>
-          <p>In this react node application, the users can view the demo as either a contract or a construction job client.</p>
+        <div style={insideStyles}> <About></About>
+          
           </div>
       </div>
     </Parallax>

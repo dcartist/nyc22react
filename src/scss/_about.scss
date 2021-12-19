@@ -1,0 +1,14 @@
+.about{
+    min-width: 75vw;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    p {
+        padding: 10px 5px;
+    }
+    ul {
+        padding: 10px 5px;
+        li {
+            list-style-type: none;
+        }
+    }
+}
