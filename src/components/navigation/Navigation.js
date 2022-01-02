@@ -1,20 +1,28 @@
 import React from 'react'
 import { Menubar } from 'primereact/menubar';
 import { useHistory } from "react-router-dom";
-import { withRouter } from "react-router";
 
 export default function Navigation(props) {
+    let history = useHistory();
     let NavigateToPage = (path) =>{
         // let history = useHistory();
 		console.log('Navigate to path ' + path);
-        // history.push(path);
+        history.push(path);
 		// this.props.history.push(path);
         // showInfoMessage(this,'Navigation',path);
-        const history = useHistory();
-        console.log(history);
+        // const history = useHistory();
+        // console.log(history);
     
           
         }
+
+        //  let HomeButton = () => {
+        //     let history = useHistory();
+        //  }
+            let handleClick = () => {
+                
+              history.push("/home");
+            }
     
     const items = [
         {
@@ -144,7 +152,7 @@ export default function Navigation(props) {
            icon:'pi pi-fw pi-power-off',
            command:(e) => {
              console.log("click")
-        //    NavigateToPage("/")
+           NavigateToPage("/")
              
         }
         }
