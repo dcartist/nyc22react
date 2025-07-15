@@ -1,5 +1,6 @@
 import './App.css';
 import { Outlet, Link, Routes, Route } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
 import Home from './Pages/Home';
 import MainLayout from './Pages/MainLayout';
 import About from './Pages/About';
@@ -8,8 +9,21 @@ import Navigation from './Components/Navigation/Navigation';
 import SettingsLayout from './Pages/Dashboard/Settings';
 import Profile from './Pages/Dashboard/Profile';
 import Billing from './Pages/Dashboard/Billing';
+import {getAllJobs} from './services/api';
 import { MDBContainer, MDBRow, MDBCol } from 'mdb-react-ui-kit';
+
+
+
 function App() {
+  const [users, setUsers] = useState([]);
+  const [error, setError] = useState("");
+  useEffect(() => {
+    getAllJobs()
+      .then(setUsers)
+      .catch((err) => setError(err.message));
+      console.log(users)
+  }, []);
+
   return (
     <div className="App">
 <MDBContainer fluid>
