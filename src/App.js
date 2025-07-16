@@ -7,7 +7,9 @@ import About from './Pages/About';
 import Dashboard from './Pages/Dashboard/Dashboard';
 import Navigation from './Components/Navigation/Navigation';
 import SettingsLayout from './Pages/Dashboard/Settings';
-import Applicants from './Pages/Dashboard/Applicants';
+import ApplicantsLayout from './Pages/Dashboard/Applicants/ApplicantsLayout';
+import Applicants from './Pages/Dashboard/Applicants/Applicants';
+import ApplicantDetails from './Pages/Dashboard/Applicants/ApplicantDetails';
 import Profile from './Pages/Dashboard/Profile';
 import Billing from './Pages/Dashboard/Billing';
 import {getAllJobs} from './services/api';
@@ -40,8 +42,11 @@ function App() {
           <Route index element={<Home />} />
           <Route path="about" element={<About />} />
           <Route path="dashboard" element={<Dashboard />}> 
-            <Route index element={<Applicants />} />
-            <Route path="applicants" element={<Applicants />} />
+            <Route index element={<ApplicantsLayout />} />
+            <Route path="applicants" element={<ApplicantsLayout />}>
+              <Route index element={<Applicants />} />
+              <Route path=":applicantId" element={<ApplicantDetails />} />
+            </Route>
           <Route path="profile" element={<Profile />} />
           <Route path="settings" element={<SettingsLayout />}>
               

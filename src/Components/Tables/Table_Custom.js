@@ -5,10 +5,11 @@ import { Link } from 'react-router-dom';
 
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
+import { useNavigate } from 'react-router-dom';
 
 export default function Table_Custom({ tableData }) {
   const [rowData, setRowData] = useState([]);
-
+  const navigate = useNavigate();
   useEffect(() => {
     setRowData(Array.isArray(tableData) ? tableData : []);
   }, [tableData]);
@@ -55,6 +56,9 @@ const paginationPageSizeSelector = [10, 20, 50, 100];
            pagination={pagination}
     paginationPageSize={paginationPageSize}
     paginationPageSizeSelector={paginationPageSizeSelector}
+    onRowClicked={params => {
+            navigate(`${params.data._id}`);
+          }}
         />
       </div>
     </div>
