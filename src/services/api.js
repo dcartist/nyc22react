@@ -10,6 +10,14 @@ export const getAllApplications = async () => {
     return res.data;
 };
 
+export const getApplicantsByPage = async (page) => {
+    const res = await axios.get(`${API_BASE}/applications/page/${page}`);
+    if (res.status !== 200) throw new Error("Failed to fetch applications by page");
+    console.log("Applications by page fetched successfully:", res.data);
+    return res.data;
+};
+
+
 export const getOneApplication = async (id) => {
     const res = await axios.get(`${API_BASE}/applications/id/${id}`);
     if (res.status !== 200) throw new Error("Failed to fetch application");
