@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { AllCommunityModule,   themeQuartz } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
-import 'ag-grid-community/styles/ag-grid.css';
+// import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { useNavigate } from 'react-router-dom';
 import "./table.css"
