@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react'
-import { AllCommunityModule } from 'ag-grid-community'; 
-import { AgGridReact } from 'ag-grid-react'; 
-import { Link } from 'react-router-dom';
-
+import { AllCommunityModule,   themeQuartz } from 'ag-grid-community';
+import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { useNavigate } from 'react-router-dom';
+import "./table.css"
 
 export default function Table_Custom({ tableData }) {
   const [rowData, setRowData] = useState([]);
@@ -15,14 +14,14 @@ export default function Table_Custom({ tableData }) {
   }, [tableData]);
 
   const [colDefs] = useState([
-    { headerName: "First Name", field: "applicant_firstName", filter: true, sortable: true },
+    { headerName: "First Name", field: "applicant_firstName", filter: true, sortable: true, },
     { headerName: "Last Name", field: "applicant_lastName", filter: true, sortable: true },
     { headerName: "License", field: "applicant_license", filter: true, sortable: true },
-    { 
-      headerName: "# of Job Listing", 
-      field: "job_listing", 
-      filter: true, 
-      sortable: true,  
+    {
+      headerName: "# of Job Listing",
+      field: "job_listing",
+      filter: true,
+      sortable: true,
       valueGetter: params => Array.isArray(params.data.job_listing) ? params.data.job_listing.length : 0,
       cellRenderer: params => {
         const jobs = params.data.job_listing;
@@ -41,8 +40,8 @@ export default function Table_Custom({ tableData }) {
     flex: 1,
   };
   const pagination = true;
-const paginationPageSize = 50;
-const paginationPageSizeSelector = [10, 20, 50, 100];
+  const paginationPageSize = 50;
+  const paginationPageSizeSelector = [10, 20, 50, 100];
 
   return (
     <div>Table_Custom
@@ -53,10 +52,12 @@ const paginationPageSizeSelector = [10, 20, 50, 100];
           rowHeight={50}
           defaultColDef={defaultColDef}
           modules={[AllCommunityModule]}
-           pagination={pagination}
-    paginationPageSize={paginationPageSize}
-    paginationPageSizeSelector={paginationPageSizeSelector}
-    onRowClicked={params => {
+          pagination={pagination}
+          paginationPageSize={paginationPageSize}
+          paginationPageSizeSelector={paginationPageSizeSelector}
+          accentColor="blue"
+          theme={themeQuartz}
+          onRowClicked={params => {
             navigate(`${params.data._id}`);
           }}
         />
