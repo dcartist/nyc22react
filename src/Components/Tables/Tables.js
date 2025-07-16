@@ -10,7 +10,7 @@ export default function DataTables({data}) {
                 app.applicant_firstName || '',
                 app.applicant_lastName || '',
                 app.applicant_license || '',
-                app.job_listing , // Assuming jobs is an array
+                app.job_listing , 
                 // app.startDate || '',
                 // app.salary || ''                        
             ]);
