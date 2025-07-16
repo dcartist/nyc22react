@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react'
 import { getApplicantsByPage } from '../../services/api'
 import DataTables from '../../Components/Tables/Tables'
 import { data } from 'react-router-dom';
+import Table_Custom from '../../Components/Tables/Table_Custom';
 
 export default function Applicants() {
   const [applications, setApplications] = useState([]);
@@ -41,13 +42,13 @@ export default function Applicants() {
   return (
     <div>Applicants
 
-        {applications.length > 0 ? (
+        {/* {applications.length > 0 ? (
           <DataTables data={applications} />
         ) : (
           <div>No applications found</div>
-        )}      
+        )}       */}
       {/* <DataTables data={dataTableInfo} /> */}
-
+<Table_Custom tableData={applications} />
       {applications.length > 0 ? (
        applications.map((app, index) => (
          <p key={index}>
