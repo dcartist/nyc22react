@@ -17,7 +17,7 @@ export default function Applicants() {
 
 
   return (
-    <div>Applicants
+    <div>
 
 <Table_Custom tableData={applications} />
     </div>
