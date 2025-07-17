@@ -44,7 +44,7 @@ export default function Table_Custom({ tableData }) {
   const paginationPageSizeSelector = [10, 20, 50, 100];
 
   return (
-    <div>Table_Custom
+    <div>
       <div className="ag-theme-alpine" style={{ width: "100%", height: "700px" }}>
         <AgGridReact
           rowData={rowData}

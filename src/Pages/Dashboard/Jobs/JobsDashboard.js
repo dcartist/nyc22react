@@ -1,7 +1,7 @@
 import React from 'react'
 import { Outlet } from 'react-router-dom';
 
-export default function ApplicantsLayout() {
+export default function JobsDashboard() {
   return (
     <div>
         <Outlet />

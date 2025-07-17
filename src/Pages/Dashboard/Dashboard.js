@@ -16,6 +16,9 @@ export default function Dashboard() {
             <MDBListGroupItem tag={Link} to="applicants" action>
               Applicants
             </MDBListGroupItem>
+            <MDBListGroupItem tag={Link} to="jobs" action>
+              Job Listings
+            </MDBListGroupItem>
             <MDBListGroupItem tag={Link} to="settings" action>
               Settings
             </MDBListGroupItem>

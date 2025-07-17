@@ -12,7 +12,10 @@ import Applicants from './Pages/Dashboard/Applicants/Applicants';
 import ApplicantDetails from './Pages/Dashboard/Applicants/ApplicantDetails';
 import Profile from './Pages/Dashboard/Profile';
 import Billing from './Pages/Dashboard/Billing';
-import {getAllJobs} from './services/api';
+import JobsDashboard from './Pages/Dashboard/Jobs/JobsDashboard';
+import Jobs from './Pages/Dashboard/Jobs/Jobs';
+import JobDetails from './Pages/Dashboard/Jobs/JobDetails';
+import {getAllJobs} from './services/api';  
 import { MDBContainer, MDBRow, MDBCol } from 'mdb-react-ui-kit';
 
 
@@ -30,11 +33,19 @@ function App() {
   return (
     <div className="App">
 <MDBContainer fluid>
+  <MDBRow className='justify-content-center bg-primary p-2'>
+    <MDBCol md='12'>
+    </MDBCol>
+  </MDBRow>
       <MDBRow>
         <MDBCol> 
 <Navigation />
 </MDBCol>
 </MDBRow>
+ <MDBRow className='justify-content-center bg-secondary smallLine'>
+    <MDBCol md='12'>
+    </MDBCol>
+  </MDBRow>
 <MDBRow>
         <MDBCol>
         <Routes>
@@ -42,10 +53,14 @@ function App() {
           <Route index element={<Home />} />
           <Route path="about" element={<About />} />
           <Route path="dashboard" element={<Dashboard />}> 
-            <Route index element={<ApplicantsLayout />} />
+            <Route index element={<Applicants />} />
             <Route path="applicants" element={<ApplicantsLayout />}>
               <Route index element={<Applicants />} />
               <Route path=":applicantId" element={<ApplicantDetails />} />
+            </Route>
+            <Route path="jobs" element={<JobsDashboard />}>
+              <Route index element={<Jobs />} />
+              <Route path=":jobId" element={<JobDetails />} />
             </Route>
           <Route path="profile" element={<Profile />} />
           <Route path="settings" element={<SettingsLayout />}>
