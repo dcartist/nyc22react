@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react'
 
+import JobsTable from '../../../Components/Tables/Jobs/JobsTable';
 import  {getAllJobs} from '../../../services/api';
 
 export default function Jobs() {
@@ -14,6 +15,8 @@ export default function Jobs() {
   }, []);
 
   return (
-    <div>Jobs</div>
+    <div>
+      <JobsTable tableData={jobs} />
+    </div>
   )
 }
