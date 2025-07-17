@@ -1,0 +1,5 @@
+.accordion-header, .mdb-accordion-header, .accordion-button {
+  font-weight: 700 !important;
+  border-bottom: 1px solid #c6c6c6 !important;
+  border-radius: 10px !important;
+}

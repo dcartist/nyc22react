@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react'
 import {getOneApplication} from '../../../services/api'
 import { useParams } from 'react-router-dom';
 import { MDBListGroup, MDBListGroupItem, MDBBadge, MDBCard, MDBCardHeader, MDBContainer, MDBRow, MDBCol, MDBAccordion, MDBAccordionItem } from 'mdb-react-ui-kit';
-
+import "./Applicant.css"
 
 export default function ApplicantDetails() {
   const [data, setApplicant] = useState(null);
@@ -28,10 +28,11 @@ export default function ApplicantDetails() {
     <div className='d-flex justify-content-center direction-column'>
       <MDBContainer>
       <MDBRow className='justify-content-center'>
+        <h1>Applicant Details</h1>
         <MDBCol md='8'>
 <MDBCard className='p-5'>
-      <MDBCardHeader><h1>Applicant Details</h1></MDBCardHeader>
-     <MDBListGroup flush>
+      <MDBCardHeader></MDBCardHeader>
+     <MDBListGroup >
       <MDBListGroupItem className='d-flex justify-content-between align-items-center text-start'>
         <div className=''>
           <div className='fw-bold'>Name:</div>
@@ -54,27 +55,37 @@ export default function ApplicantDetails() {
        </div>
       </MDBListGroupItem>
     </MDBListGroup>
- </MDBCard>
- </MDBCol>
-      </MDBRow>
-      <MDBRow className='mt-4 justify-content-center'>
-        <MDBCol md='8'>
-          <h2>Job Listings</h2>
-          <MDBAccordion initialActive={1} active={active} onChange={(itemId) => setActive(itemId)}>
+
+     <h2 className='mt-4'>Job Listings</h2>
+          <MDBAccordion initialActive={1} active={active} onChange={(itemId) => setActive(itemId)} borderless>
            
                 {data.job_listing.map((detail, index) => (
-                   <MDBAccordionItem className='fw-bold' collapseId={index+1} headerTitle={`Job ${index + 1} - ${detail.job_number}`} key={index}>
-                    <MDBListGroup flush>
-                  <MDBListGroupItem key={index} className='d-flex justify-content-between align-items-center'>
-                  <div className='text-muted'>{detail.job_number}</div>
-                  </MDBListGroupItem>
+                  <MDBAccordionItem
+                    className='fw-bold'
+                    collapseId={index + 1}
+                    headerTitle={
+                      <>
+                        {`Job No. #${detail.job_number} `}
+                        <MDBBadge color={detail.approved ? 'primary' : 'danger'} className='ms-2'>
+                          {detail.approved ? 'Approved' : 'Not Approved'}
+                        </MDBBadge>
+                      </>
+                    }
+                    key={index}
+                  >
+                    <MDBListGroup>
+                      <MDBListGroupItem key={index} className='d-flex justify-content-between align-items-center'>
+                        <div className='text-muted'>{detail.job_number}</div>
+                      </MDBListGroupItem>
                     </MDBListGroup>
-            </MDBAccordionItem>
+                  </MDBAccordionItem>
                 ))}
             
           </MDBAccordion>
-        </MDBCol>
+ </MDBCard>
+ </MDBCol>
       </MDBRow>
+      
       </MDBContainer>
 
    
