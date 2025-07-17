@@ -57,7 +57,7 @@ export default function ApplicantDetails() {
     </MDBListGroup>
 
      <h2 className='mt-4'>Job Listings</h2>
-          <MDBAccordion initialActive={1} active={active} onChange={(itemId) => setActive(itemId)} borderless>
+          <MDBAccordion initialActive={1} active={active} onChange={(itemId) => setActive(itemId)}>
            
                 {data.job_listing.map((detail, index) => (
                   <MDBAccordionItem
@@ -73,9 +73,24 @@ export default function ApplicantDetails() {
                     }
                     key={index}
                   >
-                    <MDBListGroup>
-                      <MDBListGroupItem key={index} className='d-flex justify-content-between align-items-center'>
-                        <div className='text-muted'>{detail.job_number}</div>
+                    <MDBListGroup className='text-start m-3' >
+                      {/* <MDBListGroupItem key={index} >
+                         <div className='fw-bold'>Job No: <span>{detail.job_number}</span></div>
+                      </MDBListGroupItem> */}
+                      <MDBListGroupItem key={index} >
+                         <div className='fw-bold'>Address: <span className='fw-normal'>{detail.property.house_num} {detail.property.street_name}</span></div>
+                      </MDBListGroupItem>
+                      <MDBListGroupItem key={index} >
+                         <div className='fw-bold'>Borough: <span className='fw-normal'>{detail.property.borough}</span></div>
+                      </MDBListGroupItem>
+                      <MDBListGroupItem key={index} >
+                         <div><div className='fw-bold text-start'>Description:</div><div className='fw-normal'>{detail.job_description}</div></div>
+                      </MDBListGroupItem>
+                      <MDBListGroupItem key={index} >
+                         <div className='fw-bold'>Description Status:</div><div className='fw-normal'>{detail.job_status_descrp}</div>
+                      </MDBListGroupItem>
+                      <MDBListGroupItem key={index} >
+                         <div className='fw-bold'>Job Type: <span className='fw-normal'>{detail.job_type}</span></div>
                       </MDBListGroupItem>
                     </MDBListGroup>
                   </MDBAccordionItem>

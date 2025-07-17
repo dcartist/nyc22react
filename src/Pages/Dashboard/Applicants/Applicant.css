@@ -1,5 +1,11 @@
 .accordion-header, .mdb-accordion-header, .accordion-button {
   font-weight: 700 !important;
-  border-bottom: 1px solid #c6c6c6 !important;
-  border-radius: 10px !important;
+  border-bottom: 1px solid #c6c6c6 !important; 
+  /* border-radius: 10px !important;*/
+}
+
+.accordion .collapse.show,
+.mdb-accordion .collapse.show {
+  background-color: #b3b3b396 !important; /* Light blue background */
+  transition: background-color 1s ease;
 }
