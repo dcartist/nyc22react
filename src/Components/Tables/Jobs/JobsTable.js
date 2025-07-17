@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import { useNavigate } from 'react-router-dom';
 
-export default function Table_Custom({ tableData }) {
+export default function JobsTable({ tableData }) {
   const [rowData, setRowData] = useState([]);
   const navigate = useNavigate();
   useEffect(() => {
