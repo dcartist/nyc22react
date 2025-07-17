@@ -21,9 +21,9 @@ function App() {
   const [users, setUsers] = useState([]);
   const [error, setError] = useState("");
   useEffect(() => {
-    getAllJobs()
-      .then(setUsers)
-      .catch((err) => setError(err.message));
+    // getAllJobs()
+    //   .then(setUsers)
+    //   .catch((err) => setError(err.message));
       // console.log(users)
   }, []);
 
