@@ -79,9 +79,9 @@ export default function JobsTable({ tableData }) {
             paginationPageSizeSelector={paginationPageSizeSelector}
             accentColor="blue"
             theme={themeQuartz}
-            // onRowClicked={params => {
-            //   navigate(`applicants/${params.data._id}`);
-            // }}
+            onRowClicked={params => {
+              navigate(`${params.data.job_id}`);
+            }}
           />
         </div>
       )}

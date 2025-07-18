@@ -1,7 +1,7 @@
 import "./App.css";
 
 import { MDBCol, MDBContainer, MDBRow } from "mdb-react-ui-kit";
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 
 import About from "./Pages/About";
 import ApplicantDetails from "./Pages/Dashboard/Applicants/ApplicantDetails";
@@ -41,7 +41,7 @@ function App() {
                 <Route index element={<Home />} />
                 <Route path="about" element={<About />} />
                 <Route path="dashboard" element={<Dashboard />}>
-                  <Route index element={<Applicants />} />
+                 <Route index element={<Navigate to="applicants" replace />} />
                   <Route path="applicants" element={<ApplicantsLayout />}>
                     <Route index element={<Applicants />} />
                     <Route path=":applicantId" element={<ApplicantDetails />} />
