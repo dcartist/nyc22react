@@ -77,7 +77,7 @@ export default function Table_Custom({ tableData }) {
             accentColor="blue"
             theme={themeQuartz}
             onRowClicked={params => {
-              navigate(`applicants/${params.data._id}`);
+              navigate(`${params.data._id}`);
             }}
           />
         </div>

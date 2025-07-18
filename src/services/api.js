@@ -59,3 +59,13 @@ export const getAllJobs = async () => {
     console.log("Jobs fetched successfully:", res.data);
     return res.data;
 };
+
+//Get one job by ID
+export const getOneJob = async (id) => {
+    const res = await axios.get(`${API_BASE}/jobs/id/${id}`);
+    console.log("Fetching job with ID:", id);
+    console.log("API URL:", `${API_BASE}/jobs/id/${id}`);
+    if (res.status !== 200) throw new Error("Failed to fetch job");
+    console.log("Job fetched successfully:::", res.data);
+    return res.data;
+}
