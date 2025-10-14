@@ -60,6 +60,14 @@ export const getAllJobs = async () => {
     return res.data;
 };
 
+// Get paginated jobs
+export const getPaginatedJobs = async (page, limit) => {
+    const res = await axios.get(`${API_BASE}/jobs/page/${page}/${limit}`);
+    if (res.status !== 200) throw new Error("Failed to fetch paginated jobs");
+    console.log("Paginated jobs fetched successfully:", res.data);
+    return res.data;
+};
+
 //Get one job by ID
 export const getOneJob = async (id) => {
     const res = await axios.get(`${API_BASE}/jobs/id/${id}`);
@@ -67,5 +75,19 @@ export const getOneJob = async (id) => {
     console.log("API URL:", `${API_BASE}/jobs/id/${id}`);
     if (res.status !== 200) throw new Error("Failed to fetch job");
     console.log("Job fetched successfully:::", res.data);
+    return res.data;
+}
+
+export const getJobsByPage = async (page) => {
+    const res = await axios.get(`${API_BASE}/jobs/page/${page}`);
+    if (res.status !== 200) throw new Error("Failed to fetch jobs by page");
+    console.log("Jobs by page fetched successfully:", res.data);
+    return res.data;
+}
+
+export const getMetadata = async () => {
+    const res = await axios.get(`${API_BASE}/meta`);
+    if (res.status !== 200) throw new Error("Failed to fetch metadata");
+    console.log("Metadata fetched successfully:", res.data);
     return res.data;
 }
