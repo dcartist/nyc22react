@@ -27,7 +27,7 @@ export default function Jobs() {
 
     const fetchMetadata = async () => {
       const metadata = await getMetadata();
-      setJobAmount(metadata.job_count || 0);
+      setJobAmount(metadata.JobTotal || 0);
       console.log("Metadata:", metadata);
     };
     fetchMetadata();
