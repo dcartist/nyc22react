@@ -43,7 +43,7 @@ export default function JobsTablePagination({
       sortable: true,
       minWidth: 80,
       maxWidth: 150,
-      cellRenderer: 'JobLinkRenderer'   // use the React renderer by name
+      cellRenderer: 'JobLinkRenderer' 
     },
     {
       headerName: "# of Contractors",
@@ -157,7 +157,6 @@ export default function JobsTablePagination({
             modules={[AllCommunityModule]}
             pagination={false}
             suppressPaginationPanel={true}
-            // register React cell renderers here
             components={{ JobLinkRenderer }}
             accentColor="blue"
             theme={themeQuartz}
