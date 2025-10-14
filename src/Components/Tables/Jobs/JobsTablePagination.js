@@ -5,7 +5,23 @@ import { AllCommunityModule, themeQuartz } from 'ag-grid-community';
 import { MDBBtn, MDBSpinner } from 'mdb-react-ui-kit';
 import { useMemo } from 'react';
 import { AgGridReact } from 'ag-grid-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+
+// React cell renderer for the Job Number column
+function JobLinkRenderer(props) {
+  const id = props.data?.job_id;
+  const label = props.value || id || '';
+  if (!id) return <span>{label}</span>;
+  return (
+    <Link
+      to={`${id}`}              // navigates to /current-route/<job_id>
+      onClick={e => e.stopPropagation()} // prevent row click from firing too
+      className="text-primary text-decoration-underline"
+    >
+      {label}
+    </Link>
+  );
+}
 
 export default function JobsTablePagination({
   tableData = [],
@@ -20,7 +36,15 @@ export default function JobsTablePagination({
   const navigate = useNavigate();
 
   const colDefs = useMemo(() => ([
-    { headerName: "Job Number", field: "job_number", filter: true, sortable: true, minWidth: 80, maxWidth: 150 },
+    {
+      headerName: "Job Number",
+      field: "job_number",
+      filter: true,
+      sortable: true,
+      minWidth: 80,
+      maxWidth: 150,
+      cellRenderer: 'JobLinkRenderer'   // use the React renderer by name
+    },
     {
       headerName: "# of Contractors",
       field: "contractors",
@@ -55,6 +79,19 @@ export default function JobsTablePagination({
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
   const startIdx = total === 0 ? 0 : (page - 1) * pageSize + 1;
   const endIdx = Math.min(page * pageSize, total);
+
+  const rowHeight = 50;
+  // Header + padding allowance
+  const headerAllowance = 70;
+  // Max grid body height
+  const maxGridHeight = 700;
+  // When no rows, keep a minimum height (e.g. spinner / empty state)
+  const minGridHeight = 250;
+
+  const visibleRows = tableData.length;
+  const calculatedHeight = visibleRows === 0
+    ? minGridHeight
+    : Math.min(maxGridHeight, headerAllowance + (visibleRows * rowHeight));
 
   return (
     <div>
@@ -104,20 +141,32 @@ export default function JobsTablePagination({
           </MDBBtn>
         </div>
       ) : (
-        <div className="ag-theme-alpine" style={{ width: "100%", height: "700px" }}>
+        <div
+          className="ag-theme-alpine"
+          style={{
+            width: "100%",
+            height: `${calculatedHeight}px`,
+            transition: 'height 0.25s ease'
+          }}
+        >
           <AgGridReact
             rowData={tableData}
             columnDefs={colDefs}
             defaultColDef={defaultColDef}
-            rowHeight={50}
+            rowHeight={rowHeight}
             modules={[AllCommunityModule]}
-            pagination={false}             // server-side handled externally
+            pagination={false}
             suppressPaginationPanel={true}
+            // register React cell renderers here
+            components={{ JobLinkRenderer }}
             accentColor="blue"
             theme={themeQuartz}
             onRowClicked={params => {
-              if (params.data?.job_id) navigate(`${params.data.job_id}`);
+              navigate(`${params.data._id}`);
             }}
+            // onRowClicked={params => {
+            //   if (params.data?.job_id) navigate(`${params.data.job_id}`);
+            // }}
           />
         </div>
       )}
