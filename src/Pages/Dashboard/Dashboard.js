@@ -10,8 +10,14 @@ export default function Dashboard() {
       <MDBRow>
         <MDBCol md="2" className="bg-light min-vh-100 p-3">
           <MDBListGroup>
-            <MDBListGroupItem tag={Link} to="/" action>
+            {/* <MDBListGroupItem tag={Link} to="/" action>
               Home
+            </MDBListGroupItem> */}
+            <MDBListGroupItem tag={Link} to="applicants" action>
+              Applicants
+            </MDBListGroupItem>
+            <MDBListGroupItem tag={Link} to="jobs" action>
+              Job Listings
             </MDBListGroupItem>
             <MDBListGroupItem tag={Link} to="settings" action>
               Settings
