@@ -3,6 +3,7 @@ import { formatToCurrency, isoToReadable } from '../../../services/conversions';
 import { useEffect, useState } from 'react'
 
 import { NYMap } from "../../../Components/Map";
+import Mapgl from "../../../Components/Map_gl";
 import { getOneJob } from '../../../services/api';
 import { useParams } from 'react-router-dom';
 
@@ -141,7 +142,8 @@ export default function JobDetails() {
 
                                         </MDBListGroupItem>
                                         <MDBListGroupItem>
-                                           <NYMap newLocation={`${data.property.house_num} ${data.property.street_name}, ${data.property.borough}`} />
+                                           {/* <NYMap newLocation={`${data.property.house_num} ${data.property.street_name}, ${data.property.borough}`} /> */}
+                                             <Mapgl newLocation={`${data.property.house_num} ${data.property.street_name}, ${data.property.borough}`} />
                                         </MDBListGroupItem>
                                        
                                     </MDBListGroup>
