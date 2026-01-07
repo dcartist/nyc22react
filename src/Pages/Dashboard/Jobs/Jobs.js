@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-
+import { Link } from 'react-router-dom';
 import { getPaginatedJobs, getMetadata } from '../../../services/api';
 import JobsTablePagination from '../../../Components/Tables/Jobs/JobsTablePagination';
 
@@ -61,6 +61,13 @@ export default function Jobs() {
 
   return (
     <div>
+      <button className="btn btn-primary mb-3" onClick={loadJobs} disabled={loading}>
+        {loading ? 'Loading...' : 'Refresh Jobs'}
+      </button>
+      
+        <Link to="/dashboard/jobs/add" className="btn btn-success mb-3 ms-3">
+          Add New Job
+        </Link>
       <JobsTablePagination
         tableData={jobs}
         loading={loading}

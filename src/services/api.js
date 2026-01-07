@@ -85,9 +85,26 @@ export const getJobsByPage = async (page) => {
     return res.data;
 }
 
+export const getJobStatusMapping = async () => {
+    const res = await axios.get(`${API_BASE}/jobs/statusmap`);
+    if (res.status !== 200) throw new Error("Failed to fetch job status mapping");
+    console.log("Job status mapping fetched successfully:", res.data);
+    return res.data;
+}
+
 export const getMetadata = async () => {
     const res = await axios.get(`${API_BASE}/meta`);
     if (res.status !== 200) throw new Error("Failed to fetch metadata");
     console.log("Metadata fetched successfully:", res.data);
     return res.data;
 }
+
+export const addJob = async (jobData) => {
+  const response = await fetch(`${API_BASE}/jobs/add`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(jobData)
+  });
+  if (!response.ok) throw response;
+  return response.json();
+};

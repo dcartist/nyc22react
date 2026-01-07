@@ -10,6 +10,7 @@ import ApplicantsLayout from "./Pages/Dashboard/Applicants/ApplicantsLayout";
 import Billing from "./Pages/Dashboard/Billing";
 import Dashboard from "./Pages/Dashboard/Dashboard";
 import Home from "./Pages/Home";
+import JobsAdd from "./Pages/Dashboard/Jobs/JobsAdd";
 import JobDetails from "./Pages/Dashboard/Jobs/JobDetails";
 import Jobs from "./Pages/Dashboard/Jobs/Jobs";
 import JobsDashboard from "./Pages/Dashboard/Jobs/JobsDashboard";
@@ -48,6 +49,7 @@ function App() {
                   </Route>
                   <Route path="jobs" element={<JobsDashboard />}>
                     <Route index element={<Jobs />} />
+                    <Route path="add" element={<JobsAdd />} />
                     <Route path=":jobId" element={<JobDetails />} />
                   </Route>
                   <Route path="profile" element={<Profile />} />
