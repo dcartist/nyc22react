@@ -108,3 +108,25 @@ export const addJob = async (jobData) => {
   if (!response.ok) throw response;
   return response.json();
 };
+
+export const findContractosBySearchTermandPageNumber = async (searchTerm, pagenumber) => {
+    const res = await axios.get(`${API_BASE}/contractors/search/${searchTerm}/page/${pagenumber}`);
+    if (res.status !== 200) throw new Error("Failed to fetch contractors by search term");
+    console.log("Contractors by search term fetched successfully:", res.data);
+    return res.data;
+};
+
+export const getNewJobNumber = async () => {
+    const res = await axios.get(`${API_BASE}/jobs/newjobnumber`);
+    if (res.status !== 200) throw new Error("Failed to fetch new job number");
+    console.log("New job number fetched successfully:", res.data);
+    return res.data;
+}
+
+
+export const getJobTypes = async () => {
+    const res = await axios.get(`${API_BASE}/jobs/types`);
+    if (res.status !== 200) throw new Error("Failed to fetch job types");
+    console.log("Job types fetched successfully:", res.data);
+    return res.data;
+}

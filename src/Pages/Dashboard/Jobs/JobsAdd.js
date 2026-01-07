@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { MDBBtn, MDBInput, MDBTextArea, MDBCheckbox, MDBSelect } from 'mdb-react-ui-kit';
-import { addJob, getJobStatusMapping } from '../../../services/api';
+import { addJob, getJobStatusMapping, getNewJobNumber, getJobTypes } from '../../../services/api';
 
 export default function JobsAdd() {
   const [formData, setFormData] = useState({
@@ -27,10 +27,11 @@ export default function JobsAdd() {
   });
 
   const [loading, setLoading] = useState(false);
+  const [newJobNumber, setNewJobNumber] = useState('');
   const [jobStatusMapping, setJobStatusMapping] = useState([]);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-
+  const [jobTypes, setJobTypes] = useState([]);
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
@@ -100,6 +101,27 @@ export default function JobsAdd() {
   };
 
   useEffect(() => {
+    // Fetch job types on mount
+    (async () => {
+      try {
+        const types = await getJobTypes();
+        console.log('Job types fetched:', types);
+        setJobTypes(types);
+      } catch (e) {
+        console.error('Failed to fetch job types', e);
+      }
+    })();
+    // Fetch new job number on mount
+    (async () => {
+      try {
+        const newJobNum = await getNewJobNumber();
+        console.log('New job number fetched:', newJobNum.newJobNumber);
+        setNewJobNumber(newJobNum.newJobNumber);
+        setFormData(prev => ({ ...prev, job_number: newJobNum.newJobNumber }));
+      } catch (e) {
+        console.error('Failed to fetch new job number', e);
+      }
+    })();
     // Fetch job status mapping for dropdown (if needed)
     (async () => {
       try {
@@ -127,9 +149,10 @@ export default function JobsAdd() {
               label="Job Number *"
               name="job_number"
               type="text"
-              value={formData.job_number}
+              value={formData.job_number || newJobNumber}
               onChange={handleChange}
               required
+              disabled
             />
           </div>
 
