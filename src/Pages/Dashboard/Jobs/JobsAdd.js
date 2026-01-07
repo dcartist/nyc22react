@@ -61,6 +61,24 @@ export default function JobsAdd() {
     }));
   };
 
+  const handleJobTypeChange = (input) => {
+    let value = '';
+    if (input == null) value = '';
+    else if (typeof input === 'string') value = input;
+    else if (input.target && input.target.value !== undefined) value = input.target.value;
+    else if (Array.isArray(input) && input.length > 0) {
+      const first = input[0];
+      value = typeof first === 'string' ? first : first?.value ?? first?.label ?? '';
+    } else if (typeof input === 'object') {
+      value = input.value ?? input.label ?? '';
+    }
+
+    setFormData(prev => ({
+      ...prev,
+      job_type: value
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -158,13 +176,20 @@ export default function JobsAdd() {
 
           {/* Job Type */}
           <div className="col-md-6 mb-3">
-            <MDBInput
-              label="Job Type"
-              name="job_type"
-              type="text"
-              value={formData.job_type}
-              onChange={handleChange}
-            />
+            <div className="form-outline">
+              <MDBSelect
+                label="Job Type"
+                data={[
+                  { text: 'Select Job Type', value: '' },
+                  ...jobTypes.map((jt) => ({
+                    text: `${jt.job_type} - ${jt.label}`,
+                    value: jt.job_type
+                  }))
+                ]}
+                value={formData.job_type}
+                onChange={handleJobTypeChange}
+              />
+            </div>
           </div>
 
           {/* Prefiling Date */}
