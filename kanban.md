@@ -25,6 +25,10 @@
 
   - defaultExpanded: false
 
+### Job Section: Search for Contractor via create job
+
+  - defaultExpanded: false
+
 ## In Progress
 
 ## Testing
