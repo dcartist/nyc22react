@@ -39,8 +39,19 @@ export default function JobsAdd() {
     }));
   };
 
-  const handleStatusChange = (e) => {
-    const value = e.target.value;
+  const handleStatusChange = (input) => {
+    // Accept MDBSelect output (string | array | object) or native event
+    let value = '';
+    if (input == null) value = '';
+    else if (typeof input === 'string') value = input;
+    else if (input.target && input.target.value !== undefined) value = input.target.value;
+    else if (Array.isArray(input) && input.length > 0) {
+      const first = input[0];
+      value = typeof first === 'string' ? first : first?.value ?? first?.label ?? '';
+    } else if (typeof input === 'object') {
+      value = input.value ?? input.label ?? '';
+    }
+
     const matchedStatus = jobStatusMapping.find(s => s.job_status === value);
     setFormData(prev => ({
       ...prev,
@@ -157,20 +168,20 @@ export default function JobsAdd() {
 
           {/* Job Status */}
           <div className="col-md-6 mb-3">
-            <label className="form-label">Job Status</label>
-            <select
-              className="form-select"
-              name="job_status"
-              value={formData.job_status}
-              onChange={handleStatusChange}
-            >
-              <option value="">Select Job Status</option>
-              {jobStatusMapping.map((status) => (
-                <option key={status.job_status} value={status.job_status}>
-                  {status.job_status} - {status.job_status_short}
-                </option>
-              ))}
-            </select>
+            <div className="form-outline">
+              <MDBSelect
+                label="Job Status"
+                data={[
+                  { text: 'Select Job Status', value: '' },
+                  ...jobStatusMapping.map((status) => ({
+                    text: `${status.job_status} - ${status.job_status_short}`,
+                    value: status.job_status
+                  }))
+                ]}
+                value={formData.job_status}
+                onChange={handleStatusChange}
+              />
+            </div>
           </div>
 
           {/* Job Status Description */}
