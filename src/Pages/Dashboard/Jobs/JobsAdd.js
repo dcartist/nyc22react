@@ -130,6 +130,12 @@ export default function JobsAdd() {
     return contractor.email || license || '';
   };
 
+  // ANCHOR Helper to get contractor ID (_id)
+  const getContractorId = (contractor) => {
+    if (!contractor) return undefined;
+    return contractor._id;
+  };
+
   // ANCHOR Open Contractor Modal and fetch contractors if not already loaded
   const openContractorModal = async () => {
     setContractorModalOpen(true);
@@ -151,15 +157,15 @@ export default function JobsAdd() {
 
 // ANCHOR Handle adding/removing contractor from form data
   const handleAddContractor = (contractor) => {
-    const label = formatContractorLabel(contractor);
-    if (!label) return;
+    const id = getContractorId(contractor);
+    if (!id) return;
     setFormData(prev => {
-      const exists = prev.contractors.includes(label);
+      const exists = prev.contractors.includes(id);
       return {
         ...prev,
         contractors: exists
-          ? prev.contractors.filter(c => c !== label)
-          : [...prev.contractors, label]
+          ? prev.contractors.filter(c => c !== id)
+          : [...prev.contractors, id]
       };
     });
   };
@@ -244,6 +250,12 @@ export default function JobsAdd() {
     const term = contractorSearch.toLowerCase();
     const haystack = formatContractorLabel(c).toLowerCase();
     return haystack.includes(term);
+  });
+
+  // ANCHOR Human-readable labels for selected contractor IDs
+  const selectedContractorLabels = formData.contractors.map(id => {
+    const match = contractorsList.find(c => getContractorId(c) === id);
+    return match ? formatContractorLabel(match) : id;
   });
 
   return (
@@ -421,7 +433,7 @@ export default function JobsAdd() {
               label="Contractors"
               name="contractors"
               type="text"
-              value={formData.contractors.join(', ')}
+              value={selectedContractorLabels.join(', ')}
               readOnly
               onClick={openContractorModal}
             />
@@ -527,10 +539,11 @@ export default function JobsAdd() {
                 <div className="list-group mt-3" style={{ maxHeight: '400px', overflowY: 'auto' }}>
                   {filteredContractors.map((c, idx) => {
                     const label = formatContractorLabel(c);
-                    const isSelected = formData.contractors.includes(label);
+                    const cid = getContractorId(c);
+                    const isSelected = cid ? formData.contractors.includes(cid) : false;
                     return (
                       <button
-                        key={c.contractor_id || c.id || label || idx}
+                        key={c._id || c.contractor_id || c.id || label || idx}
                         type="button"
                         className={`list-group-item list-group-item-action d-flex justify-content-between align-items-center ${isSelected ? 'active' : ''}`}
                         onClick={() => handleAddContractor(c)}
