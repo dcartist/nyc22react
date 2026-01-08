@@ -51,6 +51,13 @@ export const getAllContractors = async () => {
     console.log("Contractors fetched successfully:", res.data);
     return res.data;
 };
+// Get all Contractors
+export const getAllContractorsShort = async () => {
+    const res = await axios.get(`${API_BASE}/contractors/shortlist`);
+    if (res.status !== 200) throw new Error("Failed to fetch contractors");
+    console.log("Contractors fetched successfully:", res.data);
+    return res.data;
+};
 
 //Get all Jobs
 export const getAllJobs = async () => {

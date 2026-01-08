@@ -1,6 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { MDBBtn, MDBInput, MDBTextArea, MDBCheckbox, MDBSelect } from 'mdb-react-ui-kit';
-import { addJob, getJobStatusMapping, getNewJobNumber, getJobTypes } from '../../../services/api';
+import {
+  MDBBtn,
+  MDBInput,
+  MDBTextArea,
+  MDBCheckbox,
+  MDBSelect,
+  MDBModal,
+  MDBModalDialog,
+  MDBModalContent,
+  MDBModalHeader,
+  MDBModalTitle,
+  MDBModalBody,
+  MDBModalFooter
+} from 'mdb-react-ui-kit';
+import { addJob, getJobStatusMapping, getNewJobNumber, getJobTypes, getAllContractorsShort } from '../../../services/api';
 
 export default function JobsAdd() {
   const [formData, setFormData] = useState({
@@ -32,6 +45,11 @@ export default function JobsAdd() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [jobTypes, setJobTypes] = useState([]);
+  const [contractorModalOpen, setContractorModalOpen] = useState(false);
+  const [contractorsList, setContractorsList] = useState([]);
+  const [contractorSearch, setContractorSearch] = useState('');
+  const [contractorsLoading, setContractorsLoading] = useState(false);
+  const [contractorsError, setContractorsError] = useState('');
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
@@ -79,6 +97,64 @@ export default function JobsAdd() {
     }));
   };
 
+  // ANCHOR Helper to format contractor label 
+  const formatContractorLabel = (contractor) => {
+    if (!contractor) return '';
+    const first = contractor.first_name || contractor.firstName || '';
+    const last = contractor.last_name || contractor.lastName || '';
+    const license = contractor.license_num || contractor.licenseNumber || contractor.license || '';
+
+    const nameParts = `${first} ${last}`.trim();
+    const fullWithLicense = `${nameParts} ${license}`.trim();
+
+    if (fullWithLicense) return fullWithLicense;
+
+    // Fallbacks if the above fields are missing
+    return (
+      contractor.business_name ||
+      contractor.name ||
+      contractor.company ||
+      contractor.email ||
+      contractor.id ||
+      String(contractor)
+    );
+  };
+
+  // ANCHOR Open Contractor Modal and fetch contractors if not already loaded
+  const openContractorModal = async () => {
+    setContractorModalOpen(true);
+    if (contractorsList.length === 0 && !contractorsLoading) {
+      setContractorsLoading(true);
+      setContractorsError('');
+      try {
+        const data = await getAllContractorsShort();
+        setContractorsList(Array.isArray(data) ? data : []);
+      } catch (e) {
+        console.error('Failed to fetch contractors', e);
+        setContractorsError('Failed to load contractors');
+      } finally {
+        setContractorsLoading(false);
+      }
+    }
+  };
+
+
+// ANCHOR Handle adding/removing contractor from form data
+  const handleAddContractor = (contractor) => {
+    const label = formatContractorLabel(contractor);
+    if (!label) return;
+    setFormData(prev => {
+      const exists = prev.contractors.includes(label);
+      return {
+        ...prev,
+        contractors: exists
+          ? prev.contractors.filter(c => c !== label)
+          : [...prev.contractors, label]
+      };
+    });
+  };
+
+  // ANCHOR Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -119,7 +195,7 @@ export default function JobsAdd() {
   };
 
   useEffect(() => {
-    // Fetch job types on mount
+    // ANCHOR Fetch job types on mount
     (async () => {
       try {
         const types = await getJobTypes();
@@ -129,7 +205,7 @@ export default function JobsAdd() {
         console.error('Failed to fetch job types', e);
       }
     })();
-    // Fetch new job number on mount
+    // ANCHOR Fetch new job number on mount
     (async () => {
       try {
         const newJobNum = await getNewJobNumber();
@@ -140,7 +216,7 @@ export default function JobsAdd() {
         console.error('Failed to fetch new job number', e);
       }
     })();
-    // Fetch job status mapping for dropdown (if needed)
+    // ANCHOR Fetch job status mapping for dropdown (if needed)
     (async () => {
       try {
         const jobmapping = await getJobStatusMapping(); // Adjust if there's a specific endpoint
@@ -151,6 +227,14 @@ export default function JobsAdd() {
       }
     })();
   }, []);
+
+// ANCHOR Filtered contractors based on search term
+  const filteredContractors = contractorsList.filter(c => {
+    if (!contractorSearch) return true;
+    const term = contractorSearch.toLowerCase();
+    const haystack = formatContractorLabel(c).toLowerCase();
+    return haystack.includes(term);
+  });
 
   return (
     <div className="container mt-5">
@@ -174,7 +258,7 @@ export default function JobsAdd() {
             />
           </div>
 
-          {/* Job Type */}
+          {/*  ANCHOR Job Type */}
           <div className="col-md-6 mb-3">
             <div className="form-outline">
               <MDBSelect
@@ -192,7 +276,7 @@ export default function JobsAdd() {
             </div>
           </div>
 
-          {/* Prefiling Date */}
+          {/*  ANCHOR Prefiling Date */}
           <div className="col-md-6 mb-3">
             <MDBInput
               label="Prefiling Date"
@@ -203,7 +287,7 @@ export default function JobsAdd() {
             />
           </div>
 
-          {/* Latest Action Date */}
+          {/*  ANCHOR Latest Action Date */}
           <div className="col-md-6 mb-3">
             <MDBInput
               label="Latest Action Date"
@@ -214,7 +298,7 @@ export default function JobsAdd() {
             />
           </div>
 
-          {/* Job Status */}
+          {/*  ANCHOR Job Status */}
           <div className="col-md-6 mb-3">
             <div className="form-outline">
               <MDBSelect
@@ -232,7 +316,7 @@ export default function JobsAdd() {
             </div>
           </div>
 
-          {/* Job Status Description */}
+          {/*  ANCHOR Job Status Description */}
           <div className="col-md-6 mb-3">
             <MDBInput
               label="Job Status Description"
@@ -244,7 +328,7 @@ export default function JobsAdd() {
             />
           </div>
 
-          {/* Application Number */}
+          {/*  ANCHOR Application Number */}
           <div className="col-md-6 mb-3">
             <MDBInput
               label="Application Number"
@@ -255,7 +339,7 @@ export default function JobsAdd() {
             />
           </div>
 
-          {/* Application ID */}
+          {/*  ANCHOR Application ID */}
           <div className="col-md-6 mb-3">
             <MDBInput
               label="Application ID"
@@ -266,7 +350,7 @@ export default function JobsAdd() {
             />
           </div>
 
-          {/* Property ID */}
+          {/*  ANCHOR Property ID */}
           <div className="col-md-6 mb-3">
             <MDBInput
               label="Property ID"
@@ -277,7 +361,7 @@ export default function JobsAdd() {
             />
           </div>
 
-          {/* Property Property ID */}
+          {/*  ANCHOR Property Property ID */}
           <div className="col-md-6 mb-3">
             <MDBInput
               label="Property Property ID"
@@ -288,7 +372,7 @@ export default function JobsAdd() {
             />
           </div>
 
-          {/* Job Description */}
+          {/*  ANCHOR Job Description */}
           <div className="col-md-6 mb-3">
             <MDBTextArea
               label="Job Description"
@@ -299,7 +383,7 @@ export default function JobsAdd() {
             />
           </div>
 
-          {/* Other Description */}
+          {/*  ANCHOR Other Description */}
           <div className="col-md-6 mb-3">
             <MDBTextArea
               label="Other Description"
@@ -310,7 +394,7 @@ export default function JobsAdd() {
             />
           </div>
 
-          {/* Professional Cert */}
+          {/*  ANCHOR Professional Cert */}
           <div className="col-md-6 mb-3">
             <MDBInput
               label="Professional Cert"
@@ -321,21 +405,24 @@ export default function JobsAdd() {
             />
           </div>
 
-          {/* Contractors */}
+          {/*  ANCHOR Contractors */}
           <div className="col-md-6 mb-3">
             <MDBInput
-              label="Contractors (comma-separated)"
+              label="Contractors"
               name="contractors"
               type="text"
-              value={formData.contractors.join(',')}
-              onChange={(e) => setFormData(prev => ({
-                ...prev,
-                contractors: e.target.value.split(',').filter(c => c.trim())
-              }))}
+              value={formData.contractors.join(', ')}
+              readOnly
+              onClick={openContractorModal}
             />
+            <div className="mt-2">
+              <MDBBtn color="primary" size="sm" type="button" onClick={openContractorModal}>
+                Search & Add Contractor
+              </MDBBtn>
+            </div>
           </div>
 
-          {/* Initial Cost */}
+          {/*  ANCHOR Initial Cost */}
           <div className="col-md-6 mb-3">
             <MDBInput
               label="Initial Cost"
@@ -347,7 +434,7 @@ export default function JobsAdd() {
             />
           </div>
 
-          {/* Total Est Fee */}
+          {/*  ANCHOR Total Est Fee */}
           <div className="col-md-6 mb-3">
             <MDBInput
               label="Total Estimated Fee"
@@ -359,7 +446,7 @@ export default function JobsAdd() {
             />
           </div>
 
-          {/* Approved Date */}
+          {/*  ANCHOR Approved Date */}
           <div className="col-md-6 mb-3">
             <MDBInput
               label="Approved Date"
@@ -370,7 +457,7 @@ export default function JobsAdd() {
             />
           </div>
 
-          {/* Paid */}
+          {/*  ANCHOR Paid */}
           <div className="col-md-6 mb-3">
             <MDBCheckbox
               name="paid"
@@ -380,7 +467,7 @@ export default function JobsAdd() {
             />
           </div>
 
-          {/* Fully Permitted */}
+          {/*  ANCHOR Fully Permitted */}
           <div className="col-md-6 mb-3">
             <MDBCheckbox
               name="fully_permitted"
@@ -390,7 +477,7 @@ export default function JobsAdd() {
             />
           </div>
 
-          {/* Approved */}
+          {/*  ANCHOR Approved */}
           <div className="col-md-6 mb-3">
             <MDBCheckbox
               name="approved"
@@ -401,7 +488,7 @@ export default function JobsAdd() {
           </div>
         </div>
 
-        {/* Submit Button */}
+        {/*  ANCHOR Submit Button */}
         <div className="row">
           <div className="col-12">
             <MDBBtn color="success" type="submit" disabled={loading}>
@@ -410,6 +497,53 @@ export default function JobsAdd() {
           </div>
         </div>
       </form>
+      <MDBModal open={contractorModalOpen} setOpen={setContractorModalOpen} tabIndex='-1'>
+        <MDBModalDialog size='lg' scrollable>
+          <MDBModalContent>
+            <MDBModalHeader>
+              <MDBModalTitle>Select Contractor</MDBModalTitle>
+              <MDBBtn className='btn-close' color='none' onClick={() => setContractorModalOpen(false)}></MDBBtn>
+            </MDBModalHeader>
+            <MDBModalBody>
+              <MDBInput
+                label="Search contractor"
+                type="text"
+                value={contractorSearch}
+                onChange={(e) => setContractorSearch(e.target.value)}
+              />
+              {contractorsLoading && <p className="mt-3">Loading contractors...</p>}
+              {contractorsError && <p className="mt-3 text-danger">{contractorsError}</p>}
+              {!contractorsLoading && !contractorsError && (
+                <div className="list-group mt-3" style={{ maxHeight: '400px', overflowY: 'auto' }}>
+                  {filteredContractors.map((c, idx) => {
+                    const label = formatContractorLabel(c);
+                    const isSelected = formData.contractors.includes(label);
+                    return (
+                      <button
+                        key={c.contractor_id || c.id || label || idx}
+                        type="button"
+                        className={`list-group-item list-group-item-action d-flex justify-content-between align-items-center ${isSelected ? 'active' : ''}`}
+                        onClick={() => handleAddContractor(c)}
+                      >
+                        <span>{label}</span>
+                        {isSelected && <span className="badge bg-light text-dark">Selected</span>}
+                      </button>
+                    );
+                  })}
+                  {filteredContractors.length === 0 && (
+                    <div className="text-muted small">No contractors found.</div>
+                  )}
+                </div>
+              )}
+            </MDBModalBody>
+            <MDBModalFooter>
+              <MDBBtn color="secondary" onClick={() => setContractorModalOpen(false)}>
+                Close
+              </MDBBtn>
+            </MDBModalFooter>
+          </MDBModalContent>
+        </MDBModalDialog>
+      </MDBModal>
     </div>
   );
 }
