@@ -103,21 +103,31 @@ export default function JobsAdd() {
     const first = contractor.first_name || contractor.firstName || '';
     const last = contractor.last_name || contractor.lastName || '';
     const license = contractor.license_num || contractor.licenseNumber || contractor.license || '';
+    const licenseType = contractor.license_type || '';
+    const licenseSlNo = contractor.license_sl_no || '';
+    const licenseDescriptor = `${licenseType} ${licenseSlNo}`.trim();
 
     const nameParts = `${first} ${last}`.trim();
-    const fullWithLicense = `${nameParts} ${license}`.trim();
+    // If we have a person name, prefer "First Last - license_type license_sl_no" (or basic license info)
+    if (nameParts) {
+      if (licenseDescriptor) return `${nameParts} - ${licenseDescriptor}`;
+      if (license) return `${nameParts} ${license}`.trim();
+      return nameParts;
+    }
 
-    if (fullWithLicense) return fullWithLicense;
+    // If no person name, prefer business / company name (optionally with license details)
+    const company = contractor.business_name || contractor.company || contractor.name || '';
+    if (company) {
+      if (licenseDescriptor) return `${company} - ${licenseDescriptor}`;
+      if (license) return `${company} ${license}`.trim();
+      return company;
+    }
 
-    // Fallbacks if the above fields are missing
-    return (
-      contractor.business_name ||
-      contractor.name ||
-      contractor.company ||
-      contractor.email ||
-      contractor.id ||
-      String(contractor)
-    );
+    // If there is no name or company, show license_type with license_sl_no if available
+    if (licenseDescriptor) return licenseDescriptor;
+
+    // Final fallbacks
+    return contractor.email || license || '';
   };
 
   // ANCHOR Open Contractor Modal and fetch contractors if not already loaded
