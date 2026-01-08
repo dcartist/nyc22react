@@ -13,7 +13,7 @@ import {
   MDBModalBody,
   MDBModalFooter
 } from 'mdb-react-ui-kit';
-import { addJob, getJobStatusMapping, getNewJobNumber, getJobTypes, getAllContractorsShort } from '../../../services/api';
+import { addJob, getJobStatusMapping, getNewJobNumber, getJobTypes, getAllContractorsShort, getAllApplications } from '../../../services/api';
 
 export default function JobsAdd() {
   const [formData, setFormData] = useState({
@@ -50,6 +50,11 @@ export default function JobsAdd() {
   const [contractorSearch, setContractorSearch] = useState('');
   const [contractorsLoading, setContractorsLoading] = useState(false);
   const [contractorsError, setContractorsError] = useState('');
+  const [applicantModalOpen, setApplicantModalOpen] = useState(false);
+  const [applicantsList, setApplicantsList] = useState([]);
+  const [applicantSearch, setApplicantSearch] = useState('');
+  const [applicantsLoading, setApplicantsLoading] = useState(false);
+  const [applicantsError, setApplicantsError] = useState('');
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
@@ -136,6 +141,23 @@ export default function JobsAdd() {
     return contractor._id;
   };
 
+  // ANCHOR Helper to format applicant label for listing
+  const formatApplicantLabel = (app) => {
+    if (!app) return '';
+    const first = app.applicant_first_name || app.applicant_firstName || app.first_name || app.firstName || '';
+    const last = app.applicant_last_name || app.applicant_lastName || app.last_name || app.lastName || '';
+    const fullName = `${first} ${last}`.trim();
+
+    const title = app.title || app.job_title || app.business_title || '';
+    const license = app.applicant_license || app.license || app.license_num || '';
+
+    const namePart = fullName || app.applicant_name || app.name || '';
+
+    // Build label as: "First Last - applicant_license - title" (skipping missing pieces)
+    const parts = [namePart, license, title].filter(Boolean);
+    return parts.join(' - ');
+  };
+
   // ANCHOR Open Contractor Modal and fetch contractors if not already loaded
   const openContractorModal = async () => {
     setContractorModalOpen(true);
@@ -154,6 +176,24 @@ export default function JobsAdd() {
     }
   };
 
+  // ANCHOR Open Applicant Modal and fetch applicants if not already loaded
+  const openApplicantModal = async () => {
+    setApplicantModalOpen(true);
+    if (applicantsList.length === 0 && !applicantsLoading) {
+      setApplicantsLoading(true);
+      setApplicantsError('');
+      try {
+        const data = await getAllApplications();
+        setApplicantsList(Array.isArray(data) ? data : []);
+      } catch (e) {
+        console.error('Failed to fetch applicants', e);
+        setApplicantsError('Failed to load applicants');
+      } finally {
+        setApplicantsLoading(false);
+      }
+    }
+  };
+
 
 // ANCHOR Handle adding/removing contractor from form data
   const handleAddContractor = (contractor) => {
@@ -168,6 +208,17 @@ export default function JobsAdd() {
           : [...prev.contractors, id]
       };
     });
+  };
+
+  // ANCHOR Handle selecting an applicant: fill Application Number and ID
+  const handleSelectApplicant = (applicant) => {
+    if (!applicant) return;
+    setFormData(prev => ({
+      ...prev,
+      application_num: applicant.application_num || applicant.application_number || prev.application_num,
+      application_id: applicant.application_id || applicant._id || prev.application_id
+    }));
+    setApplicantModalOpen(false);
   };
 
   // ANCHOR Handle form submission
@@ -251,6 +302,40 @@ export default function JobsAdd() {
     const haystack = formatContractorLabel(c).toLowerCase();
     return haystack.includes(term);
   });
+
+  // ANCHOR Filtered applicants based on search term
+  const filteredApplicants = applicantsList.filter(a => {
+    if (!applicantSearch) return true;
+    const term = applicantSearch.toLowerCase();
+    const haystack = formatApplicantLabel(a).toLowerCase();
+    return haystack.includes(term);
+  });
+
+  // ANCHOR Selected applicant based on Application ID or Number
+  const selectedApplicant = applicantsList.find(a => {
+    const appId = a.application_id || a._id;
+    const appNum = a.application_num || a.application_number;
+    return (appId && appId === formData.application_id) ||
+           (appNum && appNum === formData.application_num);
+  });
+
+  // ANCHOR Derived display values for Application Number (name) and ID (license)
+  const applicantFirst = selectedApplicant
+    ? (selectedApplicant.applicant_first_name || selectedApplicant.applicant_firstName || selectedApplicant.first_name || selectedApplicant.firstName || '')
+    : '';
+  const applicantLast = selectedApplicant
+    ? (selectedApplicant.applicant_last_name || selectedApplicant.applicant_lastName || selectedApplicant.last_name || selectedApplicant.lastName || '')
+    : '';
+  const applicantFullName = `${applicantFirst} ${applicantLast}`.trim() ||
+    (selectedApplicant?.applicant_name || selectedApplicant?.name || '');
+
+  const applicationNumberDisplay = selectedApplicant
+    ? (applicantFullName || formData.application_num)
+    : formData.application_num;
+
+  const applicationIdDisplay = selectedApplicant
+    ? (selectedApplicant.applicant_license || selectedApplicant.license || selectedApplicant.license_num || formData.application_id)
+    : formData.application_id;
 
   // ANCHOR Human-readable labels for selected contractor IDs
   const selectedContractorLabels = formData.contractors.map(id => {
@@ -356,9 +441,16 @@ export default function JobsAdd() {
               label="Application Number"
               name="application_num"
               type="text"
-              value={formData.application_num}
+              value={applicationNumberDisplay}
               onChange={handleChange}
+              readOnly
+              onClick={openApplicantModal}
             />
+            <div className="mt-2">
+              <MDBBtn color="primary" size="sm" type="button" onClick={openApplicantModal}>
+                Search & Select Applicant
+              </MDBBtn>
+            </div>
           </div>
 
           {/*  ANCHOR Application ID */}
@@ -367,8 +459,10 @@ export default function JobsAdd() {
               label="Application ID"
               name="application_id"
               type="text"
-              value={formData.application_id}
+              value={applicationIdDisplay}
               onChange={handleChange}
+              readOnly
+              onClick={openApplicantModal}
             />
           </div>
 
@@ -519,6 +613,52 @@ export default function JobsAdd() {
           </div>
         </div>
       </form>
+      {/* Applicant selection modal */}
+      <MDBModal open={applicantModalOpen} setOpen={setApplicantModalOpen} tabIndex='-1'>
+        <MDBModalDialog size='lg' scrollable>
+          <MDBModalContent>
+            <MDBModalHeader>
+              <MDBModalTitle>Select Applicant</MDBModalTitle>
+              <MDBBtn className='btn-close' color='none' onClick={() => setApplicantModalOpen(false)}></MDBBtn>
+            </MDBModalHeader>
+            <MDBModalBody>
+              <MDBInput
+                label="Search applicant"
+                type="text"
+                value={applicantSearch}
+                onChange={(e) => setApplicantSearch(e.target.value)}
+              />
+              {applicantsLoading && <p className="mt-3">Loading applicants...</p>}
+              {applicantsError && <p className="mt-3 text-danger">{applicantsError}</p>}
+              {!applicantsLoading && !applicantsError && (
+                <div className="list-group mt-3" style={{ maxHeight: '400px', overflowY: 'auto' }}>
+                  {filteredApplicants.map((a, idx) => {
+                    const label = formatApplicantLabel(a);
+                    return (
+                      <button
+                        key={a.application_id || a._id || a.application_num || idx}
+                        type="button"
+                        className="list-group-item list-group-item-action"
+                        onClick={() => handleSelectApplicant(a)}
+                      >
+                        {label}
+                      </button>
+                    );
+                  })}
+                  {filteredApplicants.length === 0 && (
+                    <div className="text-muted small">No applicants found.</div>
+                  )}
+                </div>
+              )}
+            </MDBModalBody>
+            <MDBModalFooter>
+              <MDBBtn color="secondary" onClick={() => setApplicantModalOpen(false)}>
+                Close
+              </MDBBtn>
+            </MDBModalFooter>
+          </MDBModalContent>
+        </MDBModalDialog>
+      </MDBModal>
       <MDBModal open={contractorModalOpen} setOpen={setContractorModalOpen} tabIndex='-1'>
         <MDBModalDialog size='lg' scrollable>
           <MDBModalContent>
