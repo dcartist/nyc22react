@@ -142,5 +142,6 @@ export const searchProperties = async (searchTerm) => {
     const res = await axios.get(`${API_BASE}/properties/search/${searchTerm}`);
     if (res.status !== 200) throw new Error("Failed to search properties");
     console.log("Properties searched successfully:", res.data);
+    console.log(res.data);
     return res.data;
 }

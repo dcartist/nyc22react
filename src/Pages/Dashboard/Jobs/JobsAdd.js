@@ -13,7 +13,8 @@ import {
   MDBModalBody,
   MDBModalFooter
 } from 'mdb-react-ui-kit';
-import { addJob, getJobStatusMapping, getNewJobNumber, getJobTypes, getAllContractorsShort, getAllApplications } from '../../../services/api';
+import Mapgl from '../../../Components/Map_gl';
+import { addJob, getJobStatusMapping, getNewJobNumber, getJobTypes, getAllContractorsShort, getAllApplications, searchProperties } from '../../../services/api';
 
 export default function JobsAdd() {
   const [formData, setFormData] = useState({
@@ -55,6 +56,11 @@ export default function JobsAdd() {
   const [applicantSearch, setApplicantSearch] = useState('');
   const [applicantsLoading, setApplicantsLoading] = useState(false);
   const [applicantsError, setApplicantsError] = useState('');
+  const [propertyModalOpen, setPropertyModalOpen] = useState(false);
+  const [propertySearch, setPropertySearch] = useState('');
+  const [propertiesList, setPropertiesList] = useState([]);
+  const [propertiesLoading, setPropertiesLoading] = useState(false);
+  const [propertiesError, setPropertiesError] = useState('');
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
@@ -158,6 +164,69 @@ export default function JobsAdd() {
     return parts.join(' - ');
   };
 
+  // ANCHOR Helper to format property label for listing
+  const formatPropertyLabel = (prop) => {
+    if (!prop) return '';
+
+    const house = prop.house_num || prop.house_number || prop.house || '';
+    const street = prop.street_name || prop.street || prop.primary_street || '';
+    const borough = prop.borough || prop.city || '';
+    const bbl = prop.bbl || '';
+
+    const address = `${house} ${street}`.trim();
+    const parts = [address, borough, bbl].filter(Boolean);
+
+    if (parts.length > 0) return parts.join(' - ');
+
+    const id = prop.propertyID || prop.property_id || prop._id;
+    return id || '';
+  };
+
+  // ANCHOR Helper to derive property owner name
+  const getPropertyOwnerName = (prop) => {
+    if (!prop) return '';
+
+    const owner1First =
+      prop.property_owner_firstName ||
+      prop.property_owner_first_name ||
+      prop.owner1_first_name ||
+      prop.owner1_firstName ||
+      '';
+    const owner1Last =
+      prop.property_owner_lastName ||
+      prop.property_owner_last_name ||
+      prop.owner1_last_name ||
+      prop.owner1_lastName ||
+      '';
+    const owner1Full = `${owner1First} ${owner1Last}`.trim();
+
+    const owner2First = prop.owner2_first_name || prop.owner2_firstName || '';
+    const owner2Last = prop.owner2_last_name || prop.owner2_lastName || '';
+    const owner2Full = `${owner2First} ${owner2Last}`.trim();
+
+    const businessOwner =
+      prop.property_owner_business_name ||
+      prop.property_owner_businessName ||
+      '';
+
+    const explicitOwner =
+      prop.owner_name ||
+      prop.ownerName ||
+      prop.property_owner ||
+      prop.owner_full_name ||
+      prop.owner ||
+      prop.owner1_name ||
+      '';
+
+    if (businessOwner) return businessOwner;
+    if (explicitOwner) return explicitOwner;
+    if (owner1Full && owner2Full) return `${owner1Full} & ${owner2Full}`;
+    if (owner1Full) return owner1Full;
+    if (owner2Full) return owner2Full;
+
+    return '';
+  };
+
   // ANCHOR Open Contractor Modal and fetch contractors if not already loaded
   const openContractorModal = async () => {
     setContractorModalOpen(true);
@@ -194,6 +263,37 @@ export default function JobsAdd() {
     }
   };
 
+  // ANCHOR Open Property Modal
+  const openPropertyModal = () => {
+    setPropertyModalOpen(true);
+  };
+
+  // ANCHOR Search properties whenever the search input changes
+  const handlePropertySearchChange = async (e) => {
+    const term = e.target.value;
+    setPropertySearch(term);
+
+    const trimmed = term.trim();
+    if (!trimmed) {
+      setPropertiesList([]);
+      setPropertiesError('');
+      setPropertiesLoading(false);
+      return;
+    }
+
+    setPropertiesLoading(true);
+    setPropertiesError('');
+    try {
+      const data = await searchProperties(trimmed);
+      setPropertiesList(Array.isArray(data) ? data : []);
+    } catch (e) {
+      console.error('Failed to search properties', e);
+      setPropertiesError('Failed to search properties');
+    } finally {
+      setPropertiesLoading(false);
+    }
+  };
+
 
 // ANCHOR Handle adding/removing contractor from form data
   const handleAddContractor = (contractor) => {
@@ -219,6 +319,17 @@ export default function JobsAdd() {
       application_id: applicant.application_id || applicant._id || prev.application_id
     }));
     setApplicantModalOpen(false);
+  };
+
+  // ANCHOR Handle selecting a property: fill Property ID fields
+  const handleSelectProperty = (prop) => {
+    if (!prop) return;
+    setFormData(prev => ({
+      ...prev,
+      propertyID: prop.propertyID || prop.property_id || prop._id || prev.propertyID,
+      Property_proptertyID: prop.Property_proptertyID || prop.property_proptertyID || prev.Property_proptertyID
+    }));
+    setPropertyModalOpen(false);
   };
 
   // ANCHOR Handle form submission
@@ -310,6 +421,36 @@ export default function JobsAdd() {
     const haystack = formatApplicantLabel(a).toLowerCase();
     return haystack.includes(term);
   });
+
+  // ANCHOR Selected property based on Property ID
+  const selectedProperty = propertiesList.find(p => {
+    const id = p.propertyID || p.property_id || p._id;
+    return id && id === formData.propertyID;
+  });
+
+  const propertyDisplay = selectedProperty
+    ? formatPropertyLabel(selectedProperty)
+    : formData.propertyID;
+
+  // ANCHOR Derived address and owner name for display and map
+  const propertyHouse = selectedProperty
+    ? (selectedProperty.house_num || selectedProperty.house_number || selectedProperty.house || '')
+    : '';
+  const propertyStreet = selectedProperty
+    ? (selectedProperty.street_name || selectedProperty.street || selectedProperty.primary_street || '')
+    : '';
+  const propertyBorough = selectedProperty
+    ? (selectedProperty.borough || selectedProperty.city || '')
+    : '';
+
+  const propertyAddressLine = `${propertyHouse} ${propertyStreet}`.trim();
+  const propertyOwnerName = selectedProperty ? getPropertyOwnerName(selectedProperty) : '';
+
+  const propertyMapLocation = selectedProperty
+    ? [propertyAddressLine, propertyBorough, 'NY']
+        .filter(Boolean)
+        .join(', ')
+    : propertyDisplay;
 
   // ANCHOR Selected applicant based on Application ID or Number
   const selectedApplicant = applicantsList.find(a => {
@@ -466,27 +607,7 @@ export default function JobsAdd() {
             />
           </div>
 
-          {/*  ANCHOR Property ID */}
-          <div className="col-md-6 mb-3">
-            <MDBInput
-              label="Property ID"
-              name="propertyID"
-              type="text"
-              value={formData.propertyID}
-              onChange={handleChange}
-            />
-          </div>
 
-          {/*  ANCHOR Property Property ID */}
-          <div className="col-md-6 mb-3">
-            <MDBInput
-              label="Property Property ID"
-              name="Property_proptertyID"
-              type="text"
-              value={formData.Property_proptertyID}
-              onChange={handleChange}
-            />
-          </div>
 
           {/*  ANCHOR Job Description */}
           <div className="col-md-6 mb-3">
@@ -602,6 +723,59 @@ export default function JobsAdd() {
               onChange={handleChange}
             />
           </div>
+
+          {/*  ANCHOR Property Address */}
+          <div className="col-md-6 mb-3">
+            <MDBInput
+              label="Property Address"
+              name="propertyID"
+              type="text"
+              value={propertyDisplay}
+              onChange={handleChange}
+              readOnly
+              onClick={openPropertyModal}
+            />
+            <div className="mt-2">
+              <MDBBtn color="primary" size="sm" type="button" onClick={openPropertyModal}>
+                Search & Select Property
+              </MDBBtn>
+            </div>
+          </div>
+
+          {/*  ANCHOR Property Owner Name (derived from property record) */}
+          <div className="col-md-6 mb-3">
+            <MDBInput
+              label="Property Owner Name"
+              name="property_owner_name"
+              type="text"
+              value={propertyOwnerName}
+              readOnly
+            />
+          </div>
+
+          {/*  ANCHOR Property Details & Map */}
+          {selectedProperty && (
+            <div className="col-12 mb-4">
+              <div className="card">
+                <div className="card-body">
+                  <h5 className="card-title mb-3">Property Details</h5>
+                  {propertyAddressLine && (
+                    <p className="mb-1">
+                      <strong>Address:</strong> {propertyAddressLine}
+                      {propertyBorough && `, ${propertyBorough}, NY`}
+                    </p>
+                  )}
+                  {propertyOwnerName && (
+                    <p className="mb-3">
+                      <strong>Owner:</strong> {propertyOwnerName}
+                    </p>
+                  )}
+                  <Mapgl newLocation={propertyMapLocation} />
+                </div>
+              </div>
+            </div>
+          )}
+
         </div>
 
         {/*  ANCHOR Submit Button */}
@@ -613,6 +787,52 @@ export default function JobsAdd() {
           </div>
         </div>
       </form>
+      {/* Property selection modal */}
+      <MDBModal open={propertyModalOpen} setOpen={setPropertyModalOpen} tabIndex='-1'>
+        <MDBModalDialog size='lg' scrollable>
+          <MDBModalContent>
+            <MDBModalHeader>
+              <MDBModalTitle>Select Property</MDBModalTitle>
+              <MDBBtn className='btn-close' color='none' onClick={() => setPropertyModalOpen(false)}></MDBBtn>
+            </MDBModalHeader>
+            <MDBModalBody>
+              <MDBInput
+                label="Search property"
+                type="text"
+                value={propertySearch}
+                onChange={handlePropertySearchChange}
+              />
+              {propertiesLoading && <p className="mt-3">Searching properties...</p>}
+              {propertiesError && <p className="mt-3 text-danger">{propertiesError}</p>}
+              {!propertiesLoading && !propertiesError && propertiesList.length > 0 && (
+                <div className="list-group mt-3" style={{ maxHeight: '400px', overflowY: 'auto' }}>
+                  {propertiesList.map((p, idx) => {
+                    const label = formatPropertyLabel(p);
+                    return (
+                      <button
+                        key={p.propertyID || p.property_id || p._id || idx}
+                        type="button"
+                        className="list-group-item list-group-item-action"
+                        onClick={() => handleSelectProperty(p)}
+                      >
+                        {label}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+              {!propertiesLoading && !propertiesError && propertiesList.length === 0 && propertySearch.trim() && (
+                <div className="mt-3 text-muted small">No properties found.</div>
+              )}
+            </MDBModalBody>
+            <MDBModalFooter>
+              <MDBBtn color="secondary" onClick={() => setPropertyModalOpen(false)}>
+                Close
+              </MDBBtn>
+            </MDBModalFooter>
+          </MDBModalContent>
+        </MDBModalDialog>
+      </MDBModal>
       {/* Applicant selection modal */}
       <MDBModal open={applicantModalOpen} setOpen={setApplicantModalOpen} tabIndex='-1'>
         <MDBModalDialog size='lg' scrollable>
