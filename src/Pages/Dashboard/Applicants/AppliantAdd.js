@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { addApplicant } from '../../../services/api';
 import {
   MDBCard,
   MDBCardBody,
@@ -92,23 +93,7 @@ export default function AppliantAdd() {
     setIsSubmitting(true);
 
     try {
-      // TODO: Add API endpoint for creating applicants
-      // For now, this is a placeholder
-      const API_BASE = process.env.REACT_APP_API_URL || process.env.REACT_APP_API_URL_DEV;
-      
-      const response = await fetch(`${API_BASE}/applications/add`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData)
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to create applicant');
-      }
-
-      const data = await response.json();
+      const data = await addApplicant(formData);
       console.log('Applicant created successfully:', data);
       
       setSubmitSuccess(true);
