@@ -145,3 +145,14 @@ export const searchProperties = async (searchTerm) => {
     console.log(res.data);
     return res.data;
 }
+
+// Add new applicant
+export const addApplicant = async (applicantData) => {
+  const response = await fetch(`${API_BASE}/applications/add`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(applicantData)
+  });
+  if (!response.ok) throw response;
+  return response.json();
+};
