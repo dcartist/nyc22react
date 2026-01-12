@@ -18,7 +18,7 @@ export default function Applicants() {
 
   return (
     <div>
-<Link to="/dashboard/applicants/new">Create New Application</Link>
+<Link to="/dashboard/applicants/new"><button>Create New Application</button></Link>
 <Table_Custom tableData={applications} />
     </div>
   )
