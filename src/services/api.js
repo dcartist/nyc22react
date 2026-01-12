@@ -36,6 +36,13 @@ export const getApplicationByLicense = async (license) => {
     return res.data;
 };  
 
+export const getApplicantsTitles = async () => {
+    const res = await axios.get(`${API_BASE}/applications/titles/`);
+    if (res.status !== 200) throw new Error("Failed to fetch application titles by page");
+    console.log("Application titles by page fetched successfully:", res.data);
+    return res.data;
+}
+
 // ANCHOR: Get all properties
 export const getAllProperties = async () => {
     const res = await axios.get(`${API_BASE}/properties`);

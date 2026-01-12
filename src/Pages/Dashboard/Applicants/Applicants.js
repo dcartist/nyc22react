@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react'
 import { getApplicantsByPage, getAllApplications } from '../../../services/api'
-import { data } from 'react-router-dom';
+import { data, Link } from 'react-router-dom';
 import Table_Custom from '../../../Components/Tables/Applicants/Table_Custom';
 
 export default function Applicants() {
@@ -18,7 +18,7 @@ export default function Applicants() {
 
   return (
     <div>
-
+<Link to="/dashboard/applicants/new">Create New Application</Link>
 <Table_Custom tableData={applications} />
     </div>
   )

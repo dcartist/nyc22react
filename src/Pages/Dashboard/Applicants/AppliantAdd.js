@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { addApplicant } from '../../../services/api';
+import { addApplicant, getApplicantsTitles } from '../../../services/api';
 import {
   MDBCard,
   MDBCardBody,
@@ -34,6 +34,29 @@ export default function AppliantAdd() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [titleOptions, setTitleOptions] = useState([]);
+  const [titlesLoading, setTitlesLoading] = useState(false);
+  const [titlesError, setTitlesError] = useState('');
+
+  useEffect(() => {
+    const fetchTitles = async () => {
+      setTitlesLoading(true);
+      setTitlesError('');
+      try {
+        const data = await getApplicantsTitles();
+        // Accept either an array directly or an object wrapper
+        const titlesArray = Array.isArray(data) ? data : (data && Array.isArray(data.titles) ? data.titles : []);
+        setTitleOptions(titlesArray);
+      } catch (error) {
+        console.error('Error fetching applicant titles:', error);
+        setTitlesError('Unable to load titles. You can type a title manually.');
+      } finally {
+        setTitlesLoading(false);
+      }
+    };
+
+    fetchTitles();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -192,14 +215,36 @@ export default function AppliantAdd() {
                       invalid={!!errors.applicant_title}
                       feedback={errors.applicant_title}
                     >
-                      <MDBInput
-                        label="Title *"
-                        name="applicant_title"
-                        value={formData.applicant_title}
-                        onChange={handleChange}
-                        required
-                        placeholder="e.g., Electrician, Plumber, etc."
-                      />
+                      <>
+                        <label className="form-label">Title *</label>
+                        <select
+                          className="form-select"
+                          name="applicant_title"
+                          value={formData.applicant_title}
+                          onChange={handleChange}
+                          required
+                        >
+                          <option value="" disabled>
+                            {titlesLoading ? 'Loading titles...' : 'Select Title'}
+                          </option>
+                          {titleOptions.map((title, index) => {
+                            const professionalTitle = title.applicant_professional_title || title.applicant_title || '';
+                            const description = title.description || '';
+                            const label = description
+                              ? `${professionalTitle} - ${description}`
+                              : professionalTitle;
+
+                            return (
+                              <option key={index} value={professionalTitle}>
+                                {label}
+                              </option>
+                            );
+                          })}
+                        </select>
+                        {titlesError && (
+                          <div className="form-text text-danger">{titlesError}</div>
+                        )}
+                      </>
                     </MDBValidationItem>
                   </MDBCol>
                   
