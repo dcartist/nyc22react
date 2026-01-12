@@ -11,7 +11,8 @@ import {
   MDBInput,
   MDBBtn,
   MDBValidation,
-  MDBValidationItem
+  MDBValidationItem,
+  MDBSelect
 } from 'mdb-react-ui-kit';
 import './Applicant.css';
 
@@ -93,6 +94,32 @@ export default function AppliantAdd() {
       setErrors(prev => ({
         ...prev,
         [name]: ''
+      }));
+    }
+  };
+
+  const handleTitleChange = (input) => {
+    let value = '';
+
+    if (input == null) value = '';
+    else if (typeof input === 'string') value = input;
+    else if (input.target && input.target.value !== undefined) value = input.target.value;
+    else if (Array.isArray(input) && input.length > 0) {
+      const first = input[0];
+      value = typeof first === 'string' ? first : first?.value ?? first?.label ?? '';
+    } else if (typeof input === 'object') {
+      value = input.value ?? input.label ?? '';
+    }
+
+    setFormData(prev => ({
+      ...prev,
+      applicant_title: value
+    }));
+
+    if (errors.applicant_title) {
+      setErrors(prev => ({
+        ...prev,
+        applicant_title: ''
       }));
     }
   };
@@ -234,31 +261,29 @@ export default function AppliantAdd() {
                       feedback={errors.applicant_title}
                     >
                       <>
-                        <label className="form-label">Title *</label>
-                        <select
-                          className="form-select"
-                          name="applicant_title"
-                          value={formData.applicant_title}
-                          onChange={handleChange}
-                          required
-                        >
-                          <option value="" disabled>
-                            {titlesLoading ? 'Loading titles...' : 'Select Title'}
-                          </option>
-                          {titleOptions.map((title, index) => {
-                            const professionalTitle = title.applicant_professional_title || title.applicant_title || '';
-                            const description = title.description || '';
-                            const label = description
-                              ? `${professionalTitle} - ${description}`
-                              : professionalTitle;
+                        <MDBSelect
+                          label="Title *"
+                          data={[
+                            {
+                              text: titlesLoading ? 'Loading titles...' : 'Select Title',
+                              value: ''
+                            },
+                            ...titleOptions.map((title) => {
+                              const professionalTitle = title.applicant_professional_title || title.applicant_title || '';
+                              const description = title.description || '';
+                              const label = description
+                                ? `${professionalTitle} - ${description}`
+                                : professionalTitle;
 
-                            return (
-                              <option key={index} value={professionalTitle}>
-                                {label}
-                              </option>
-                            );
-                          })}
-                        </select>
+                              return {
+                                text: label,
+                                value: professionalTitle
+                              };
+                            })
+                          ]}
+                          value={formData.applicant_title}
+                          onChange={handleTitleChange}
+                        />
                         {titlesError && (
                           <div className="form-text text-danger">{titlesError}</div>
                         )}
