@@ -153,6 +153,7 @@ export const getJobTypes = async () => {
     return res.data;
 }
 
+//ANCHOR search properties
 export const searchProperties = async (searchTerm) => {
     const res = await axios.get(`${API_BASE}/properties/search/${searchTerm}`);
     if (res.status !== 200) throw new Error("Failed to search properties");
@@ -161,7 +162,7 @@ export const searchProperties = async (searchTerm) => {
     return res.data;
 }
 
-// Add new applicant
+// ANCHOR Add new applicant
 export const addApplicant = async (applicantData) => {
   const response = await fetch(`${API_BASE}/applications/add`, {
     method: 'POST',
@@ -171,3 +172,11 @@ export const addApplicant = async (applicantData) => {
   if (!response.ok) throw response;
   return response.json();
 };
+
+//ANCHOR Get application number
+export const getNewApplicationNumber = async () => {
+    const res = await axios.get(`${API_BASE}/applications/newNumber`);
+    if (res.status !== 200) throw new Error("Failed to fetch new application number");
+    console.log("New application number fetched successfully:", res.data);
+    return res.data.new_application_number;
+}

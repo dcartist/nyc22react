@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { addApplicant, getApplicantsTitles } from '../../../services/api';
+import { addApplicant, getApplicantsTitles, getNewApplicationNumber } from '../../../services/api';
 import {
   MDBCard,
   MDBCardBody,
@@ -37,6 +37,7 @@ export default function AppliantAdd() {
   const [titleOptions, setTitleOptions] = useState([]);
   const [titlesLoading, setTitlesLoading] = useState(false);
   const [titlesError, setTitlesError] = useState('');
+  const [applicationNumber, setApplicationNumber] = useState('');
 
   useEffect(() => {
     const fetchTitles = async () => {
@@ -56,6 +57,29 @@ export default function AppliantAdd() {
     };
 
     fetchTitles();
+  }, []);
+
+  useEffect(() => {
+    const fetchApplicationNumber = async () => {
+      try {
+        const data = await getNewApplicationNumber();
+        const newNumber = typeof data === 'string' || typeof data === 'number'
+          ? data
+          : data?.application_number || data?.application_num || '';
+
+        if (newNumber) {
+          setApplicationNumber(newNumber.toString());
+          setFormData(prev => ({
+            ...prev,
+            applicant_license: newNumber.toString()
+          }));
+        }
+      } catch (error) {
+        console.error('Error fetching new application number:', error);
+      }
+    };
+
+    fetchApplicationNumber();
   }, []);
 
   const handleChange = (e) => {
@@ -92,13 +116,7 @@ export default function AppliantAdd() {
       newErrors.applicant_license = 'License number is required';
     }
 
-    if (formData.applicant_email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.applicant_email)) {
-      newErrors.applicant_email = 'Invalid email format';
-    }
-
-    if (formData.applicant_phone && !/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/.test(formData.applicant_phone)) {
-      newErrors.applicant_phone = 'Invalid phone format (e.g., 123-456-7890)';
-    }
+   
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -264,88 +282,7 @@ export default function AppliantAdd() {
                   </MDBCol>
                 </MDBRow>
 
-                {/* Contact Information Section */}
-                <h5 className="mb-3 mt-4 text-primary">Contact Information</h5>
-                
-                <MDBRow className="mb-3">
-                  <MDBCol md="6">
-                    <MDBValidationItem 
-                      invalid={!!errors.applicant_email}
-                      feedback={errors.applicant_email}
-                    >
-                      <MDBInput
-                        type="email"
-                        label="Email"
-                        name="applicant_email"
-                        value={formData.applicant_email}
-                        onChange={handleChange}
-                        placeholder="example@email.com"
-                      />
-                    </MDBValidationItem>
-                  </MDBCol>
-                  
-                  <MDBCol md="6">
-                    <MDBValidationItem 
-                      invalid={!!errors.applicant_phone}
-                      feedback={errors.applicant_phone}
-                    >
-                      <MDBInput
-                        type="tel"
-                        label="Phone Number"
-                        name="applicant_phone"
-                        value={formData.applicant_phone}
-                        onChange={handleChange}
-                        placeholder="123-456-7890"
-                      />
-                    </MDBValidationItem>
-                  </MDBCol>
-                </MDBRow>
-
-                {/* Address Section */}
-                <h5 className="mb-3 mt-4 text-primary">Address</h5>
-                
-                <MDBRow className="mb-3">
-                  <MDBCol md="12">
-                    <MDBInput
-                      label="Street Address"
-                      name="applicant_address"
-                      value={formData.applicant_address}
-                      onChange={handleChange}
-                    />
-                  </MDBCol>
-                </MDBRow>
-
-                <MDBRow className="mb-3">
-                  <MDBCol md="5">
-                    <MDBInput
-                      label="City"
-                      name="applicant_city"
-                      value={formData.applicant_city}
-                      onChange={handleChange}
-                    />
-                  </MDBCol>
-                  
-                  <MDBCol md="3">
-                    <MDBInput
-                      label="State"
-                      name="applicant_state"
-                      value={formData.applicant_state}
-                      onChange={handleChange}
-                      maxLength="2"
-                      placeholder="NY"
-                    />
-                  </MDBCol>
-                  
-                  <MDBCol md="4">
-                    <MDBInput
-                      label="ZIP Code"
-                      name="applicant_zip"
-                      value={formData.applicant_zip}
-                      onChange={handleChange}
-                      placeholder="10001"
-                    />
-                  </MDBCol>
-                </MDBRow>
+       
 
                 {/* Action Buttons */}
                 <MDBRow className="mt-4">
