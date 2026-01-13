@@ -20,9 +20,9 @@ export default function JobsAdd() {
   const [formData, setFormData] = useState({
     job_number: '',
     prefiling_date: '',
-    paid: false,
+    paid: '',
     latest_action_date: '',
-    fully_permitted: false,
+    fully_permitted: '',
     job_description: '',
     job_status: '',
     job_type: '',
@@ -326,7 +326,8 @@ export default function JobsAdd() {
     if (!prop) return;
     setFormData(prev => ({
       ...prev,
-      propertyID: prop.propertyID || prop.property_id || prop._id || prev.propertyID,
+      // Prefer Mongo _id so it matches backend ObjectId validation
+      propertyID: prop._id || prop.propertyID || prop.property_id || prev.propertyID,
       Property_proptertyID: prop.Property_proptertyID || prop.property_proptertyID || prev.Property_proptertyID
     }));
     setPropertyModalOpen(false);
@@ -340,15 +341,30 @@ export default function JobsAdd() {
     setSuccess('');
 
     try {
-      const response = await addJob(formData);
+      const normalizeDate = (value) => (value === '' || value == null ? undefined : value);
+
+      const payload = {
+        ...formData,
+        // Ensure numeric fields are numbers when provided
+        initial_cost: formData.initial_cost !== '' ? Number(formData.initial_cost) : undefined,
+        total_est__fee: formData.total_est__fee !== '' ? Number(formData.total_est__fee) : undefined,
+        // Let Mongoose apply default null for empty dates
+        prefiling_date: normalizeDate(formData.prefiling_date),
+        paid: normalizeDate(formData.paid),
+        latest_action_date: normalizeDate(formData.latest_action_date),
+        fully_permitted: normalizeDate(formData.fully_permitted),
+        approved_date: normalizeDate(formData.approved_date),
+      };
+
+      const response = await addJob(payload);
       setSuccess('Job created successfully!');
       // Reset form
       setFormData({
         job_number: '',
         prefiling_date: '',
-        paid: false,
+        paid: '',
         latest_action_date: '',
-        fully_permitted: false,
+        fully_permitted: '',
         job_description: '',
         job_status: '',
         job_type: '',
@@ -366,7 +382,19 @@ export default function JobsAdd() {
         job_status_descrp: ''
       });
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to create job');
+      // Handle both fetch Response objects and generic Errors
+      try {
+        if (err && typeof err.json === 'function') {
+          const data = await err.json();
+          setError(data?.error || 'Failed to create job');
+        } else if (err && err.response) {
+          setError(err.response.data?.error || 'Failed to create job');
+        } else {
+          setError(err?.message || 'Failed to create job');
+        }
+      } catch (parseError) {
+        setError('Failed to create job');
+      }
     } finally {
       setLoading(false);
     }
@@ -694,22 +722,24 @@ export default function JobsAdd() {
             />
           </div>
 
-          {/*  ANCHOR Paid */}
+          {/*  ANCHOR Paid Date */}
           <div className="col-md-6 mb-3">
-            <MDBCheckbox
+            <MDBInput
+              label="Paid Date"
               name="paid"
-              label="Paid"
-              checked={formData.paid}
+              type="date"
+              value={formData.paid}
               onChange={handleChange}
             />
           </div>
 
-          {/*  ANCHOR Fully Permitted */}
+          {/*  ANCHOR Fully Permitted Date */}
           <div className="col-md-6 mb-3">
-            <MDBCheckbox
+            <MDBInput
+              label="Fully Permitted Date"
               name="fully_permitted"
-              label="Fully Permitted"
-              checked={formData.fully_permitted}
+              type="date"
+              value={formData.fully_permitted}
               onChange={handleChange}
             />
           </div>
