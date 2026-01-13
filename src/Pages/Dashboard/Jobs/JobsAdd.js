@@ -315,7 +315,8 @@ export default function JobsAdd() {
     if (!applicant) return;
     setFormData(prev => ({
       ...prev,
-      application_num: applicant.application_num || applicant.application_number || prev.application_num,
+      // Send applicant_license back as application_num (appNum)
+      application_num: applicant.applicant_license || applicant.license || applicant.license_num || applicant.application_num || applicant.application_number || prev.application_num,
       application_id: applicant.application_id || applicant._id || prev.application_id
     }));
     setApplicantModalOpen(false);
