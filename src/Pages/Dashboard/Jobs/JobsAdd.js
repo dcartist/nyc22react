@@ -30,6 +30,10 @@ export default function JobsAdd() {
     propertyID: '',
     application_num: '',
     application_id: '',
+    applicant_firstName: '',
+    applicant_lastName: '',
+    applicant_title: '',
+    applicant_license: '',
     contractors: [],
     Property_proptertyID: '',
     approved_date: '',
@@ -313,11 +317,28 @@ export default function JobsAdd() {
   // ANCHOR Handle selecting an applicant: fill Application Number and ID
   const handleSelectApplicant = (applicant) => {
     if (!applicant) return;
+
+    // Some APIs may wrap applicant data under an `application` key
+    const core = applicant.application || applicant;
+
     setFormData(prev => ({
       ...prev,
       // Send applicant_license back as application_num (appNum)
-      application_num: applicant.applicant_license || applicant.license || applicant.license_num || applicant.application_num || applicant.application_number || prev.application_num,
-      application_id: applicant.application_id || applicant._id || prev.application_id
+      application_num:
+        core.applicant_license || core.license || core.license_num ||
+        core.application_num || core.application_number || prev.application_num,
+      application_id:
+        core.application_id || core._id || applicant.application_id || applicant._id || prev.application_id,
+      applicant_firstName:
+        core.applicant_firstName || core.applicant_first_name || core.first_name || core.firstName ||
+        prev.applicant_firstName,
+      applicant_lastName:
+        core.applicant_lastName || core.applicant_last_name || core.last_name || core.lastName ||
+        prev.applicant_lastName,
+      applicant_title:
+        core.applicant_title || core.title || prev.applicant_title,
+      applicant_license:
+        core.applicant_license || core.license || core.license_num || prev.applicant_license
     }));
     setApplicantModalOpen(false);
   };
@@ -373,6 +394,10 @@ export default function JobsAdd() {
         propertyID: '',
         application_num: '',
         application_id: '',
+        applicant_firstName: '',
+        applicant_lastName: '',
+        applicant_title: '',
+        applicant_license: '',
         contractors: [],
         Property_proptertyID: '',
         approved_date: '',
