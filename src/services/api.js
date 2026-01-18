@@ -123,10 +123,22 @@ export const addJob = async (jobData) => {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(jobData)
   });
-// ANCHOR: Find contractors by search term and page number
   if (!response.ok) throw response;
   return response.json();
 };
+
+// ANCHOR: Edit existing job
+export const editJob = async (id, jobData) => {
+    const response = await fetch(`${API_BASE}/jobs/edit/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(jobData)
+    });
+    if (!response.ok) throw response;
+    return response.json();
+};
+
+// ANCHOR: Find contractors by search term and page number
 
 export const findContractosBySearchTermandPageNumber = async (searchTerm, pagenumber) => {
     const res = await axios.get(`${API_BASE}/contractors/search/${searchTerm}/page/${pagenumber}`);

@@ -13,6 +13,7 @@ import Dashboard from "./Pages/Dashboard/Dashboard";
 import Home from "./Pages/Home";
 import JobsAdd from "./Pages/Dashboard/Jobs/JobsAdd";
 import JobDetails from "./Pages/Dashboard/Jobs/JobDetails";
+import JobEdit from "./Pages/Dashboard/Jobs/JobEdit";
 import Jobs from "./Pages/Dashboard/Jobs/Jobs";
 import JobsDashboard from "./Pages/Dashboard/Jobs/JobsDashboard";
 import MainLayout from "./Pages/MainLayout";
@@ -53,6 +54,7 @@ function App() {
                     <Route index element={<Jobs />} />
                     <Route path="add" element={<JobsAdd />} />
                     <Route path=":jobId" element={<JobDetails />} />
+                    <Route path=":jobId/edit" element={<JobEdit />} />
                   </Route>
                   <Route path="profile" element={<Profile />} />
                   <Route path="settings" element={<SettingsLayout />}>

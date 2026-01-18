@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import { NYMap } from "../../../Components/Map";
 import Mapgl from "../../../Components/Map_gl";
 import { getOneJob } from '../../../services/api';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 
 export default function JobDetails() {
     const { jobId } = useParams();
@@ -33,7 +33,17 @@ export default function JobDetails() {
                     <MDBRow className='justify-content-center'>
                         <MDBCol md='8'>
                             <MDBCard className='p-5'>
-                                <MDBCardHeader><h2>Job Information</h2></MDBCardHeader>
+                                                                <MDBCardHeader className='d-flex justify-content-between align-items-center'>
+                                                                    <h2 className='mb-0'>Job Information</h2>
+                                                                    {jobId && (
+                                                                        <Link
+                                                                            to={`/dashboard/jobs/${jobId}/edit`}
+                                                                            className="btn btn-warning btn-sm"
+                                                                        >
+                                                                            Edit Job
+                                                                        </Link>
+                                                                    )}
+                                                                </MDBCardHeader>
                                  
                                 <MDBListGroup className='mb-5'>
                                     <MDBListGroupItem className='d-flex justify-content-between text-start'>
