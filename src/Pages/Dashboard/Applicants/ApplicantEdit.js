@@ -40,6 +40,7 @@ export default function ApplicantEdit() {
 	const [success, setSuccess] = useState('');
 	const [saveConfirmOpen, setSaveConfirmOpen] = useState(false);
 	const [activeAccordion, setActiveAccordion] = useState(1);
+	const [jobSearchTerm, setJobSearchTerm] = useState('');
 
 	const handleChange = (e) => {
 		const { name, value } = e.target;
@@ -154,6 +155,23 @@ export default function ApplicantEdit() {
 	const linkedJobs = allJobs.filter(job => {
 		const id = getJobId(job);
 		return id && formData.jobs.includes(id);
+	});
+
+	const filteredJobs = allJobs.filter(job => {
+		if (!jobSearchTerm) return true;
+		const term = jobSearchTerm.toLowerCase();
+		const number = job.job_number ? String(job.job_number).toLowerCase() : '';
+		const borough = job.property?.borough ? String(job.property.borough).toLowerCase() : '';
+		const street = job.property?.street_name ? String(job.property.street_name).toLowerCase() : '';
+		const house = job.property?.house_num ? String(job.property.house_num).toLowerCase() : '';
+		const desc = job.job_description ? String(job.job_description).toLowerCase() : '';
+		return (
+			number.includes(term) ||
+			borough.includes(term) ||
+			street.includes(term) ||
+			house.includes(term) ||
+			desc.includes(term)
+		);
 	});
 
 	if (loading) {
@@ -277,12 +295,21 @@ export default function ApplicantEdit() {
 						</MDBBtn>
 						<hr className="my-3" />
 						<h6>All Jobs (click to link/unlink)</h6>
+						<div className="mb-2">
+							<MDBInput
+								label="Search jobs by number, address, borough, or description"
+								type="text"
+								value={jobSearchTerm}
+								onChange={(e) => setJobSearchTerm(e.target.value)}
+								size="sm"
+							/>
+						</div>
 						{!jobsLoading && !jobsError && allJobs.length === 0 && (
 							<p className="text-muted">No jobs available.</p>
 						)}
-						{!jobsLoading && !jobsError && allJobs.length > 0 && (
+						{!jobsLoading && !jobsError && filteredJobs.length > 0 && (
 							<div className="list-group" style={{ maxHeight: '300px', overflowY: 'auto' }}>
-								{allJobs.map((job) => {
+								{filteredJobs.map((job) => {
 									const id = getJobId(job);
 									const selected = formData.jobs.includes(id);
 									return (
@@ -301,6 +328,9 @@ export default function ApplicantEdit() {
 									);
 								})}
 							</div>
+						)}
+						{!jobsLoading && !jobsError && allJobs.length > 0 && filteredJobs.length === 0 && (
+							<p className="text-muted">No jobs match your search.</p>
 						)}
 						<small className="text-muted d-block mt-1">
 							Click a job in the list below to add or remove it from this applicant. This does not change the applicant number.
