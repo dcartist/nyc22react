@@ -18,6 +18,7 @@ import {
 } from 'mdb-react-ui-kit';
 import { useNavigate, useParams } from 'react-router-dom';
 import { editApplicant, getAllJobs, getOneApplication } from '../../../services/api';
+import Mapgl from '../../../Components/Map_gl';
 
 export default function ApplicantEdit() {
 	const { applicantId } = useParams();
@@ -41,6 +42,8 @@ export default function ApplicantEdit() {
 	const [saveConfirmOpen, setSaveConfirmOpen] = useState(false);
 	const [activeAccordion, setActiveAccordion] = useState(1);
 	const [jobSearchTerm, setJobSearchTerm] = useState('');
+	const [viewJobModalOpen, setViewJobModalOpen] = useState(false);
+	const [selectedJob, setSelectedJob] = useState(null);
 
 	const handleChange = (e) => {
 		const { name, value } = e.target;
@@ -64,6 +67,11 @@ export default function ApplicantEdit() {
 					: [...prev.jobs, id]
 			};
 		});
+	};
+
+	const handleOpenJobModal = (job) => {
+		setSelectedJob(job);
+		setViewJobModalOpen(true);
 	};
 
 	const handleSubmit = async (e) => {
@@ -289,7 +297,19 @@ export default function ApplicantEdit() {
 							color="primary"
 							size="sm"
 							type="button"
-							onClick={() => navigate('/dashboard/jobs/add')}
+							onClick={() =>
+								navigate('/dashboard/jobs/add', {
+									state: {
+										prefillApplicant: {
+											applicant_firstName: formData.applicant_firstName,
+											applicant_lastName: formData.applicant_lastName,
+											applicant_title: formData.applicant_title,
+											applicant_license: formData.applicant_license,
+											application_id: applicantId
+										}
+									}
+								})
+							}
 						>
 							Create New Job
 						</MDBBtn>
@@ -317,7 +337,7 @@ export default function ApplicantEdit() {
 											key={id || job.job_number}
 											type="button"
 											className={`list-group-item list-group-item-action d-flex justify-content-between align-items-center ${selected ? 'active' : ''}`}
-											onClick={() => handleToggleJob(job)}
+											onClick={() => handleOpenJobModal(job)}
 										>
 											<span>
 												{job.job_number ? `Job #${job.job_number}` : 'Job'}
@@ -365,6 +385,55 @@ export default function ApplicantEdit() {
 							</MDBBtn>
 							<MDBBtn color="primary" onClick={handleReturnToPreview}>
 								Return to Preview
+							</MDBBtn>
+						</MDBModalFooter>
+					</MDBModalContent>
+				</MDBModalDialog>
+			</MDBModal>
+
+			<MDBModal open={viewJobModalOpen} setOpen={setViewJobModalOpen} tabIndex='-1'>
+				<MDBModalDialog size='lg' scrollable>
+					<MDBModalContent>
+						<MDBModalHeader>
+							<MDBModalTitle>Job Details</MDBModalTitle>
+							<MDBBtn className='btn-close' color='none' onClick={() => setViewJobModalOpen(false)}></MDBBtn>
+						</MDBModalHeader>
+						<MDBModalBody>
+							{!selectedJob && <p className="mb-0">No job selected.</p>}
+							{selectedJob && (
+								<>
+									<div className="mb-3">
+										<p><strong>Job Number:</strong> {selectedJob.job_number || 'N/A'}</p>
+										<p><strong>Job Type:</strong> {selectedJob.job_type || 'N/A'}</p>
+										<p><strong>Status:</strong> {selectedJob.job_status_descrp || selectedJob.job_status || 'N/A'}</p>
+										<p><strong>Approved:</strong> {selectedJob.approved ? 'Yes' : 'No'}</p>
+										<p><strong>Description:</strong> {selectedJob.job_description || 'N/A'}</p>
+										<p>
+											<strong>Property:</strong>{' '}
+											{selectedJob.property
+													? `${selectedJob.property.house_num || ''} ${selectedJob.property.street_name || ''}${selectedJob.property.borough ? ', ' + selectedJob.property.borough : ''}`.trim()
+													: 'N/A'}
+										</p>
+									</div>
+									{selectedJob.property && (
+										<Mapgl
+											newLocation={`${selectedJob.property.house_num || ''} ${selectedJob.property.street_name || ''}, ${selectedJob.property.borough || ''}`}
+										/>
+									)}
+								</>
+							)}
+						</MDBModalBody>
+						<MDBModalFooter>
+							{selectedJob && (
+								<MDBBtn
+									color={formData.jobs.includes(getJobId(selectedJob)) ? 'danger' : 'success'}
+									onClick={() => handleToggleJob(selectedJob)}
+								>
+									{formData.jobs.includes(getJobId(selectedJob)) ? 'Unlink Job' : 'Link Job'}
+								</MDBBtn>
+							)}
+							<MDBBtn color="secondary" onClick={() => setViewJobModalOpen(false)}>
+								Close
 							</MDBBtn>
 						</MDBModalFooter>
 					</MDBModalContent>

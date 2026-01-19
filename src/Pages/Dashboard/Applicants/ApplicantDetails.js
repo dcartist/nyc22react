@@ -68,7 +68,11 @@ export default function ApplicantDetails() {
 
      <h2 className='mt-4 d-flex justify-content-between align-items-center'>
        <span>Job Listings</span>
-       <Link to="/dashboard/jobs/add" className="btn btn-primary btn-sm">
+       <Link
+         to="/dashboard/jobs/add"
+         state={{ prefillApplicant: data }}
+         className="btn btn-primary btn-sm"
+       >
          Create New Job
        </Link>
      </h2>

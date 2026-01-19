@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import {
   MDBBtn,
   MDBInput,
@@ -17,6 +18,7 @@ import Mapgl from '../../../Components/Map_gl';
 import { addJob, getJobStatusMapping, getNewJobNumber, getJobTypes, getAllContractorsShort, getAllApplications, searchProperties } from '../../../services/api';
 
 export default function JobsAdd() {
+  const location = useLocation();
   const [formData, setFormData] = useState({
     job_number: '',
     prefiling_date: '',
@@ -343,6 +345,15 @@ export default function JobsAdd() {
     setApplicantModalOpen(false);
   };
 
+  // ANCHOR Pre-fill applicant from navigation state (e.g., from Applicant pages)
+  useEffect(() => {
+    const prefill = location.state && location.state.prefillApplicant;
+    if (prefill) {
+      handleSelectApplicant(prefill);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.state]);
+
   // ANCHOR Handle selecting a property: fill Property ID fields
   const handleSelectProperty = (prop) => {
     if (!prop) return;
@@ -658,6 +669,45 @@ export default function JobsAdd() {
               onChange={handleChange}
               readOnly
               onClick={openApplicantModal}
+            />
+          </div>
+
+          {/*  ANCHOR Applicant First Name (display) */}
+          <div className="col-md-6 mb-3">
+            <MDBInput
+              label="Applicant First Name"
+              name="applicant_firstName"
+              type="text"
+              value={applicantFirst || formData.applicant_firstName}
+              readOnly
+            />
+          </div>
+
+          {/*  ANCHOR Applicant Last Name (display) */}
+          <div className="col-md-6 mb-3">
+            <MDBInput
+              label="Applicant Last Name"
+              name="applicant_lastName"
+              type="text"
+              value={applicantLast || formData.applicant_lastName}
+              readOnly
+            />
+          </div>
+
+          {/*  ANCHOR Applicant License Number (display) */}
+          <div className="col-md-6 mb-3">
+            <MDBInput
+              label="Applicant License Number"
+              name="applicant_license"
+              type="text"
+              value={
+                (selectedApplicant &&
+                  (selectedApplicant.applicant_license ||
+                   selectedApplicant.license ||
+                   selectedApplicant.license_num)) ||
+                formData.applicant_license
+              }
+              readOnly
             />
           </div>
 
