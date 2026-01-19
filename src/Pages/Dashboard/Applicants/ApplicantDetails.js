@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react'
 import {getOneApplication} from '../../../services/api'
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { MDBListGroup, MDBListGroupItem, MDBBadge, MDBCard, MDBCardHeader, MDBContainer, MDBRow, MDBCol, MDBAccordion, MDBAccordionItem } from 'mdb-react-ui-kit';
 import "./Applicant.css"
 
@@ -31,7 +31,17 @@ export default function ApplicantDetails() {
         <h1>Applicant Details</h1>
         <MDBCol md='8'>
 <MDBCard className='p-5'>
-      <MDBCardHeader></MDBCardHeader>
+      <MDBCardHeader className='d-flex justify-content-between align-items-center'>
+        <span></span>
+        {applicantId && (
+          <Link
+            to={`/dashboard/applicants/${applicantId}/edit`}
+            className="btn btn-warning btn-sm"
+          >
+            Edit Applicant
+          </Link>
+        )}
+      </MDBCardHeader>
      <MDBListGroup >
       <MDBListGroupItem className='d-flex justify-content-between align-items-center text-start'>
         <div className=''>
@@ -56,7 +66,12 @@ export default function ApplicantDetails() {
       </MDBListGroupItem>
     </MDBListGroup>
 
-     <h2 className='mt-4'>Job Listings</h2>
+     <h2 className='mt-4 d-flex justify-content-between align-items-center'>
+       <span>Job Listings</span>
+       <Link to="/dashboard/jobs/add" className="btn btn-primary btn-sm">
+         Create New Job
+       </Link>
+     </h2>
           <MDBAccordion initialActive={1} active={active} onChange={(itemId) => setActive(itemId)}>
            
                 {data.job_listing.map((detail, index) => (

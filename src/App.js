@@ -8,6 +8,7 @@ import ApplicantDetails from "./Pages/Dashboard/Applicants/ApplicantDetails";
 import Applicants from "./Pages/Dashboard/Applicants/Applicants";
 import ApplicantsLayout from "./Pages/Dashboard/Applicants/ApplicantsLayout";
 import ApplicantAdd from "./Pages/Dashboard/Applicants/AppliantAdd";
+import ApplicantEdit from "./Pages/Dashboard/Applicants/ApplicantEdit";
 import Billing from "./Pages/Dashboard/Billing";
 import Dashboard from "./Pages/Dashboard/Dashboard";
 import Home from "./Pages/Home";
@@ -48,6 +49,7 @@ function App() {
                   <Route path="applicants" element={<ApplicantsLayout />}>
                     <Route index element={<Applicants />} />
                     <Route path=":applicantId" element={<ApplicantDetails />} />
+                    <Route path=":applicantId/edit" element={<ApplicantEdit />} />
                     <Route path="new" element={<ApplicantAdd />} />
                   </Route>
                   <Route path="jobs" element={<JobsDashboard />}>

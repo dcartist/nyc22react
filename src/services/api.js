@@ -185,6 +185,17 @@ export const addApplicant = async (applicantData) => {
   return response.json();
 };
 
+// ANCHOR Edit existing applicant
+export const editApplicant = async (id, applicantData) => {
+    const response = await fetch(`${API_BASE}/applications/edit/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(applicantData)
+    });
+    if (!response.ok) throw response;
+    return response.json();
+};
+
 //ANCHOR Get application number
 export const getNewApplicationNumber = async () => {
     const res = await axios.get(`${API_BASE}/applications/newNumber`);
