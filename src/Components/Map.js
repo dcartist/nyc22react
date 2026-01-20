@@ -16,7 +16,8 @@ export function NYMap({ newLocation }) {
     if (!map.current && mapContainer.current) {
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
-        style: 'mapbox://styles/mapbox/streets-v11',
+        style: 'mapbox://styles/dcartist/cjeu2ku2m04rl2rtastkgmyfe://styles/mapbox/streets-v11',
+        // style: 'mapbox://styles/mapbox/streets-v11',
         center: [-74.006, 40.7128], // Default to NYC
         zoom: 12,
       });

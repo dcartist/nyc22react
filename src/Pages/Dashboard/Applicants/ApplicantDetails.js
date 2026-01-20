@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react'
 import {getOneApplication} from '../../../services/api'
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { MDBListGroup, MDBListGroupItem, MDBBadge, MDBCard, MDBCardHeader, MDBContainer, MDBRow, MDBCol, MDBAccordion, MDBAccordionItem } from 'mdb-react-ui-kit';
 import "./Applicant.css"
 
@@ -23,6 +23,57 @@ export default function ApplicantDetails() {
   if (!data) {
     return <div>Loading...</div>;
   }
+  // Normalize job listings to a safe array of objects
+  const safeJobListings = Array.isArray(data.job_listing)
+    ? data.job_listing.filter(j => j && typeof j === 'object')
+    : [];
+
+  const jobListingCount = safeJobListings.length;
+
+  const jobAccordionItems = safeJobListings.map((detail, index) => {
+    const property = detail && detail.property ? detail.property : {};
+    const houseNum = property.house_num || '';
+    const streetName = property.street_name || '';
+    const borough = property.borough || '';
+
+    return (
+      <MDBAccordionItem
+        key={index}
+        className='fw-bold'
+        collapseId={index + 1}
+        headerTitle={
+          <>
+            {`Job No. #${detail.job_number} `}
+            <MDBBadge color={detail.approved ? 'primary' : 'danger'} className='ms-2'>
+              {detail.approved ? 'Approved' : 'Not Approved'}
+            </MDBBadge>
+          </>
+        }
+      >
+        <MDBListGroup className='text-start m-3'>
+          <MDBListGroupItem>
+            <div className='fw-bold'>Address: <span className='fw-normal'>{houseNum} {streetName}</span></div>
+          </MDBListGroupItem>
+          <MDBListGroupItem>
+            <div className='fw-bold'>Borough: <span className='fw-normal'>{borough || 'N/A'}</span></div>
+          </MDBListGroupItem>
+          <MDBListGroupItem>
+            <div>
+              <div className='fw-bold text-start'>Description:</div>
+              <div className='fw-normal'>{detail.job_description}</div>
+            </div>
+          </MDBListGroupItem>
+          <MDBListGroupItem>
+            <div className='fw-bold'>Description Status:</div>
+            <div className='fw-normal'>{detail.job_status_descrp}</div>
+          </MDBListGroupItem>
+          <MDBListGroupItem>
+            <div className='fw-bold'>Job Type: <span className='fw-normal'>{detail.job_type}</span></div>
+          </MDBListGroupItem>
+        </MDBListGroup>
+      </MDBAccordionItem>
+    );
+  });
 
   return (
     <div className='d-flex justify-content-center direction-column'>
@@ -31,7 +82,17 @@ export default function ApplicantDetails() {
         <h1>Applicant Details</h1>
         <MDBCol md='8'>
 <MDBCard className='p-5'>
-      <MDBCardHeader></MDBCardHeader>
+      <MDBCardHeader className='d-flex justify-content-between align-items-center'>
+        <span></span>
+        {applicantId && (
+          <Link
+            to={`/dashboard/applicants/${applicantId}/edit`}
+            className="btn btn-warning btn-sm"
+          >
+            Edit Applicant
+          </Link>
+        )}
+      </MDBCardHeader>
      <MDBListGroup >
       <MDBListGroupItem className='d-flex justify-content-between align-items-center text-start'>
         <div className=''>
@@ -51,51 +112,27 @@ export default function ApplicantDetails() {
         </div>
         <div><div className='fw-bold'>Job Applied:</div>
 
-          <span className=''>{data.job_listing.length > 0 ? data.job_listing.length : 'N/A'}</span>
+          <span className=''>{jobListingCount > 0 ? jobListingCount : 'N/A'}</span>
        </div>
       </MDBListGroupItem>
     </MDBListGroup>
 
-     <h2 className='mt-4'>Job Listings</h2>
-          <MDBAccordion initialActive={1} active={active} onChange={(itemId) => setActive(itemId)}>
-           
-                {data.job_listing.map((detail, index) => (
-                  <MDBAccordionItem
-                    className='fw-bold'
-                    collapseId={index + 1}
-                    headerTitle={
-                      <>
-                        {`Job No. #${detail.job_number} `}
-                        <MDBBadge color={detail.approved ? 'primary' : 'danger'} className='ms-2'>
-                          {detail.approved ? 'Approved' : 'Not Approved'}
-                        </MDBBadge>
-                      </>
-                    }
-                    key={index}
-                  >
-                    <MDBListGroup className='text-start m-3' >
-                      {/* <MDBListGroupItem key={index} >
-                         <div className='fw-bold'>Job No: <span>{detail.job_number}</span></div>
-                      </MDBListGroupItem> */}
-                      <MDBListGroupItem key={index} >
-                         <div className='fw-bold'>Address: <span className='fw-normal'>{detail.property.house_num} {detail.property.street_name}</span></div>
-                      </MDBListGroupItem>
-                      <MDBListGroupItem key={index} >
-                         <div className='fw-bold'>Borough: <span className='fw-normal'>{detail.property.borough}</span></div>
-                      </MDBListGroupItem>
-                      <MDBListGroupItem key={index} >
-                         <div><div className='fw-bold text-start'>Description:</div><div className='fw-normal'>{detail.job_description}</div></div>
-                      </MDBListGroupItem>
-                      <MDBListGroupItem key={index} >
-                         <div className='fw-bold'>Description Status:</div><div className='fw-normal'>{detail.job_status_descrp}</div>
-                      </MDBListGroupItem>
-                      <MDBListGroupItem key={index} >
-                         <div className='fw-bold'>Job Type: <span className='fw-normal'>{detail.job_type}</span></div>
-                      </MDBListGroupItem>
-                    </MDBListGroup>
-                  </MDBAccordionItem>
-                ))}
-            
+     <h2 className='mt-4 d-flex justify-content-between align-items-center'>
+       <span>Job Listings</span>
+       <Link
+         to="/dashboard/jobs/add"
+         state={{ prefillApplicant: data }}
+         className="btn btn-primary btn-sm"
+       >
+         Create New Job
+       </Link>
+     </h2>
+          <MDBAccordion
+            initialActive={1}
+            active={active}
+            onChange={(itemId) => setActive(itemId)}
+          >
+            {jobAccordionItems}
           </MDBAccordion>
  </MDBCard>
  </MDBCol>
