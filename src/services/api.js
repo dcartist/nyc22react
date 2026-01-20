@@ -99,6 +99,22 @@ export const getJobsByPage = async (page) => {
     console.log("Jobs by page fetched successfully:", res.data);
     return res.data;
 }
+
+// ANCHOR: Search jobs
+// Note: Backend exposes only /jobs/search/:term (no page segment),
+// so we always hit that route and let the client handle paging.
+export const searchJobs = async (searchTerm) => {
+    if (!searchTerm || !searchTerm.trim()) {
+        throw new Error("searchTerm is required for searchJobs");
+    }
+
+    const url = `${API_BASE}/jobs/search/${encodeURIComponent(searchTerm.trim())}`;
+
+    const res = await axios.get(url);
+    if (res.status !== 200) throw new Error("Failed to search jobs");
+    console.log("Jobs searched successfully:", res.data);
+    return res.data;
+}
 // ANCHOR: Get job status mapping
 
 export const getJobStatusMapping = async () => {

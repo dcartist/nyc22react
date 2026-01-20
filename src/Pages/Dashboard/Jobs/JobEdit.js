@@ -22,7 +22,9 @@ import {
 	getAllContractorsShort,
 	getAllApplications,
 	searchProperties,
-	getOneJob
+	getOneJob,
+	getOneApplication,
+	editApplicant
 } from '../../../services/api';
 
 export default function JobEdit() {
@@ -357,6 +359,63 @@ export default function JobEdit() {
 
 		try {
 			const normalizeDate = (value) => (value === '' || value == null ? undefined : value);
+
+			// Identify previous and new applicants using existing API calls
+			const originalApplicationId =
+				(initialJob && (initialJob.application?._id || initialJob.application_id)) || null;
+			const newApplicationId = formData.application_id || null;
+			const jobObjectId = jobId; // use route param as the job identifier
+
+			// Helper to extract job IDs from an applicant record
+			const extractJobIds = (application) => {
+				if (!application) return [];
+				const existingJobs = Array.isArray(application.job_listing)
+					? application.job_listing
+					: [];
+				return existingJobs
+					.map(j => (typeof j === 'object' ? (j._id || j.id || j.job_id) : j))
+					.filter(Boolean);
+			};
+
+			// Use existing applicant endpoints to keep their job listings
+			// in sync when a job is re-linked to a different applicant.
+			try {
+				// Case 1: job was linked to an applicant and is now being unlinked or moved
+				if (originalApplicationId && originalApplicationId !== newApplicationId) {
+					const originalApp = await getOneApplication(originalApplicationId);
+					const originalJobIds = extractJobIds(originalApp).filter(id => id !== jobObjectId);
+
+					const originalPayload = {
+						applicant_firstName: originalApp.applicant_firstName || '',
+						applicant_lastName: originalApp.applicant_lastName || '',
+						applicant_title: originalApp.applicant_title || '',
+						jobs: originalJobIds
+					};
+
+					await editApplicant(originalApplicationId, originalPayload);
+				}
+
+				// Case 2: job is now linked to a new applicant (either newly set or moved)
+				if (newApplicationId && newApplicationId !== originalApplicationId) {
+					const newApp = await getOneApplication(newApplicationId);
+					const baseJobIds = extractJobIds(newApp);
+					const newJobIds = baseJobIds.includes(jobObjectId)
+						? baseJobIds
+						: [...baseJobIds, jobObjectId];
+
+					const newPayload = {
+						applicant_firstName: newApp.applicant_firstName || '',
+						applicant_lastName: newApp.applicant_lastName || '',
+						applicant_title: newApp.applicant_title || '',
+						jobs: newJobIds
+					};
+
+					await editApplicant(newApplicationId, newPayload);
+				}
+			} catch (linkErr) {
+				console.error('Failed to synchronize applicant job listings during job edit', linkErr);
+				// Continue with job update even if applicant linkage sync fails
+			}
 
 			const payload = {
 				...formData,
