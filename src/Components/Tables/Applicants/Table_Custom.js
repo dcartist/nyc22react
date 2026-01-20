@@ -2,7 +2,7 @@ import 'ag-grid-community/styles/ag-theme-alpine.css';
 import "./table.css"
 
 import { AllCommunityModule, themeQuartz } from 'ag-grid-community';
-import { MDBBtn, MDBSpinner } from 'mdb-react-ui-kit';
+import { Button, Loader } from '@mantine/core';
 import { useEffect, useState } from 'react';
 
 import { AgGridReact } from 'ag-grid-react';
@@ -58,10 +58,10 @@ export default function Table_Custom({ tableData }) {
     <div>
       {loading || rowData.length === 0 ? (
         <div className="d-flex justify-content-center align-items-center" style={{ height: "700px" }}>
-          <MDBBtn disabled color='dark' outline size='lg'>
-            <MDBSpinner grow size="sm" role="status" tag="span" className="me-2" />
+          <Button disabled color='dark' variant="outline" size='lg'>
+            <Loader size="sm" type="dots" className="me-2" />
             Loading...
-          </MDBBtn>
+          </Button>
         </div>
       ) : (
         <div className="ag-theme-alpine" style={{ width: "100%", height: "700px" }}>

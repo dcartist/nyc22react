@@ -1,19 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { addApplicant, getApplicantsTitles, getNewApplicationNumber } from '../../../services/api';
-import {
-  MDBCard,
-  MDBCardBody,
-  MDBCardHeader,
-  MDBContainer,
-  MDBRow,
-  MDBCol,
-  MDBInput,
-  MDBBtn,
-  MDBValidation,
-  MDBValidationItem,
-  MDBSelect
-} from 'mdb-react-ui-kit';
+import { Container, Grid, Card, TextInput, Button, Select, Text } from '@mantine/core';
 import './Applicant.css';
 
 export default function AppliantAdd() {
@@ -103,13 +91,6 @@ export default function AppliantAdd() {
 
     if (input == null) value = '';
     else if (typeof input === 'string') value = input;
-    else if (input.target && input.target.value !== undefined) value = input.target.value;
-    else if (Array.isArray(input) && input.length > 0) {
-      const first = input[0];
-      value = typeof first === 'string' ? first : first?.value ?? first?.label ?? '';
-    } else if (typeof input === 'object') {
-      value = input.value ?? input.label ?? '';
-    }
 
     setFormData(prev => ({
       ...prev,
@@ -198,14 +179,14 @@ export default function AppliantAdd() {
   };
 
   return (
-    <MDBContainer className="mt-4">
-      <MDBRow className="justify-content-center">
-        <MDBCol md="10" lg="8">
-          <MDBCard>
-            <MDBCardHeader className="text-center py-3">
+    <Container className="mt-4">
+      <Grid className="justify-content-center">
+        <Grid.Col span={{ base: 12, md: 10, lg: 8 }}>
+          <Card className="p-4">
+            <div className="text-center pb-3 border-bottom mb-4">
               <h2 className="mb-0">Add New Applicant</h2>
-            </MDBCardHeader>
-            <MDBCardBody className="p-4">
+            </div>
+            <div className="p-1">
               {submitSuccess && (
                 <div className="alert alert-success mb-3" role="alert">
                   Applicant created successfully! Redirecting...
@@ -218,122 +199,99 @@ export default function AppliantAdd() {
                 </div>
               )}
 
-              <MDBValidation onSubmit={handleSubmit}>
+              <form onSubmit={handleSubmit}>
                 {/* Personal Information Section */}
                 <h5 className="mb-3 text-primary">Personal Information</h5>
                 
-                <MDBRow className="mb-3">
-                  <MDBCol md="6">
-                    <MDBValidationItem 
-                      invalid={!!errors.applicant_firstName}
-                      feedback={errors.applicant_firstName}
-                    >
-                      <MDBInput
+                <Grid className="mb-3" gutter="md">
+                  <Grid.Col span={{ base: 12, md: 6 }}>
+                      <TextInput
                         label="First Name *"
                         name="applicant_firstName"
                         value={formData.applicant_firstName}
                         onChange={handleChange}
                         required
+                        error={errors.applicant_firstName}
                       />
-                    </MDBValidationItem>
-                  </MDBCol>
+                  </Grid.Col>
                   
-                  <MDBCol md="6">
-                    <MDBValidationItem 
-                      invalid={!!errors.applicant_lastName}
-                      feedback={errors.applicant_lastName}
-                    >
-                      <MDBInput
+                  <Grid.Col span={{ base: 12, md: 6 }}>
+                      <TextInput
                         label="Last Name *"
                         name="applicant_lastName"
                         value={formData.applicant_lastName}
                         onChange={handleChange}
                         required
+                        error={errors.applicant_lastName}
                       />
-                    </MDBValidationItem>
-                  </MDBCol>
-                </MDBRow>
+                  </Grid.Col>
+                </Grid>
 
-                <MDBRow className="mb-3">
-                  <MDBCol md="6">
-                    <MDBValidationItem 
-                      invalid={!!errors.applicant_title}
-                      feedback={errors.applicant_title}
-                    >
-                      <>
-                        <MDBSelect
-                          label="Title *"
-                          data={[
-                            {
-                              text: titlesLoading ? 'Loading titles...' : 'Select Title',
-                              value: ''
-                            },
-                            ...titleOptions.map((title) => {
-                              const professionalTitle = title.applicant_professional_title || title.applicant_title || '';
-                              const description = title.description || '';
-                              const label = description
-                                ? `${professionalTitle} - ${description}`
-                                : professionalTitle;
+                <Grid className="mb-3" gutter="md">
+                  <Grid.Col span={{ base: 12, md: 6 }}>
+                      <Select
+                        label="Title *"
+                        placeholder={titlesLoading ? 'Loading titles...' : 'Select Title'}
+                        data={titleOptions.map((title) => {
+                          const professionalTitle = title.applicant_professional_title || title.applicant_title || '';
+                          const description = title.description || '';
+                          const label = description
+                            ? `${professionalTitle} - ${description}`
+                            : professionalTitle;
 
-                              return {
-                                text: label,
-                                value: professionalTitle
-                              };
-                            })
-                          ]}
-                          value={formData.applicant_title}
-                          onChange={handleTitleChange}
-                        />
-                        {titlesError && (
-                          <div className="form-text text-danger">{titlesError}</div>
-                        )}
-                      </>
-                    </MDBValidationItem>
-                  </MDBCol>
+                          return {
+                            value: professionalTitle,
+                            label
+                          };
+                        })}
+                        value={formData.applicant_title}
+                        onChange={handleTitleChange}
+                        error={errors.applicant_title}
+                      />
+                      {titlesError && (
+                        <div className="form-text text-danger">{titlesError}</div>
+                      )}
+                  </Grid.Col>
                   
-                  <MDBCol md="6">
-                    <MDBValidationItem 
-                      invalid={!!errors.applicant_license}
-                      feedback={errors.applicant_license}
-                    >
-                      <MDBInput
+                  <Grid.Col span={{ base: 12, md: 6 }}>
+                      <TextInput
                         label="License Number *"
                         name="applicant_license"
                         value={formData.applicant_license}
                         onChange={handleChange}
                         required
+                        error={errors.applicant_license}
                       />
-                    </MDBValidationItem>
-                  </MDBCol>
-                </MDBRow>
+                  </Grid.Col>
+                </Grid>
 
        
 
                 {/* Action Buttons */}
-                <MDBRow className="mt-4">
-                  <MDBCol className="d-flex justify-content-end gap-2">
-                    <MDBBtn 
-                      color="secondary" 
+                <Grid className="mt-4">
+                  <Grid.Col className="d-flex justify-content-end gap-2">
+                    <Button 
+                      color="gray" 
                       onClick={handleCancel}
                       type="button"
                       disabled={isSubmitting}
                     >
                       Cancel
-                    </MDBBtn>
-                    <MDBBtn 
-                      color="primary" 
+                    </Button>
+                    <Button 
+                      color="blue" 
                       type="submit"
                       disabled={isSubmitting}
                     >
                       {isSubmitting ? 'Creating...' : 'Create Applicant'}
-                    </MDBBtn>
-                  </MDBCol>
-                </MDBRow>
-              </MDBValidation>
-            </MDBCardBody>
-          </MDBCard>
-        </MDBCol>
-      </MDBRow>
-    </MDBContainer>
+                    </Button>
+                  </Grid.Col>
+                </Grid>
+              </form>
+            </div>
+          </Card>
+        </Grid.Col>
+      </Grid>
+    </Container>
   );
 }

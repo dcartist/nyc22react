@@ -2,7 +2,7 @@ import 'ag-grid-community/styles/ag-theme-alpine.css';
 import "../Applicants/table.css";
 
 import { AllCommunityModule, themeQuartz } from 'ag-grid-community';
-import { MDBBtn, MDBSpinner } from 'mdb-react-ui-kit';
+import { Button, Loader } from '@mantine/core';
 import { useMemo } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import { useNavigate, Link } from 'react-router-dom';
@@ -121,24 +121,24 @@ export default function JobsTablePagination({
         </div>
 
         <div className="d-flex align-items-center gap-2">
-          <MDBBtn size="sm" color="light" disabled={loading || page <= 1}
-                  onClick={() => onPageChange(1)}>«</MDBBtn>
-          <MDBBtn size="sm" color="light" disabled={loading || page <= 1}
-                  onClick={() => onPageChange(page - 1)}>Prev</MDBBtn>
+          <Button size="xs" color="gray" variant="light" disabled={loading || page <= 1}
+            onClick={() => onPageChange(1)}>«</Button>
+          <Button size="xs" color="gray" variant="light" disabled={loading || page <= 1}
+            onClick={() => onPageChange(page - 1)}>Prev</Button>
           <span className="small fw-semibold">Page {page} / {totalPages}</span>
-          <MDBBtn size="sm" color="light" disabled={loading || page >= totalPages}
-                  onClick={() => onPageChange(page + 1)}>Next</MDBBtn>
-          <MDBBtn size="sm" color="light" disabled={loading || page >= totalPages}
-                  onClick={() => onPageChange(totalPages)}>»</MDBBtn>
+          <Button size="xs" color="gray" variant="light" disabled={loading || page >= totalPages}
+            onClick={() => onPageChange(page + 1)}>Next</Button>
+          <Button size="xs" color="gray" variant="light" disabled={loading || page >= totalPages}
+            onClick={() => onPageChange(totalPages)}>»</Button>
         </div>
       </div>
 
       {loading ? (
         <div className="d-flex justify-content-center align-items-center" style={{ height: "600px" }}>
-          <MDBBtn disabled color='dark' outline size='lg'>
-            <MDBSpinner grow size="sm" role="status" tag="span" className="me-2" />
+          <Button disabled color='dark' variant="outline" size='lg'>
+            <Loader size="sm" type="dots" className="me-2" />
             Loading...
-          </MDBBtn>
+          </Button>
         </div>
       ) : (
         <div

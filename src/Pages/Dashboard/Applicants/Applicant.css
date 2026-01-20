@@ -9,3 +9,28 @@
   background-color: #b3b3b396 !important; /* Light blue background */
   transition: background-color 1s ease;
 }
+
+.accordion-chevron {
+  font-size: 0.8rem;
+}
+
+/* Ensure all accordion parts use the full available width */
+.accordion,
+.accordion-item {
+  width: 100%;
+}
+
+.accordion-button,
+.accordion-collapse,
+.accordion-body {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Make long text wrap within a fixed accordion width */
+.accordion-button,
+.accordion-body {
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}

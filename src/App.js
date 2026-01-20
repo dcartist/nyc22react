@@ -1,6 +1,6 @@
 import "./App.css";
 
-import { MDBCol, MDBContainer, MDBRow } from "mdb-react-ui-kit";
+import { Container, Grid } from "@mantine/core";
 import { Navigate, Route, Routes } from "react-router-dom";
 
 import About from "./Pages/About";
@@ -26,20 +26,20 @@ function App() {
 
   return (
     <div className="App">
-      <MDBContainer fluid>
-        <MDBRow className="justify-content-center bg-primary p-2">
-          <MDBCol md="12"></MDBCol>
-        </MDBRow>
-        <MDBRow>
-          <MDBCol>
+      <Container fluid>
+        <Grid className="justify-content-center bg-primary p-2">
+          <Grid.Col span={12}></Grid.Col>
+        </Grid>
+        <Grid>
+          <Grid.Col span={12}>
             <Navigation />
-          </MDBCol>
-        </MDBRow>
-        <MDBRow className="justify-content-center bg-secondary smallLine">
-          <MDBCol md="12"></MDBCol>
-        </MDBRow>
-        <MDBRow>
-          <MDBCol>
+          </Grid.Col>
+        </Grid>
+        <Grid className="justify-content-center bg-secondary smallLine">
+          <Grid.Col span={12}></Grid.Col>
+        </Grid>
+        <Grid>
+          <Grid.Col span={12}>
             <Routes>
               <Route path="/" element={<MainLayout />}>
                 <Route index element={<Home />} />
@@ -65,9 +65,9 @@ function App() {
                 </Route>
               </Route>
             </Routes>
-          </MDBCol>
-        </MDBRow>
-      </MDBContainer>
+          </Grid.Col>
+        </Grid>
+      </Container>
     </div>
   );
 }

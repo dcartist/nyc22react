@@ -6,15 +6,30 @@ import reportWebVitals from './reportWebVitals';
 import {
   BrowserRouter
 } from "react-router-dom";
-import 'mdb-react-ui-kit/dist/css/mdb.min.css';
+import '@mantine/core/styles.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import "@fortawesome/fontawesome-free/css/all.min.css";
+import { MantineProvider } from '@mantine/core';
+
+// Suppress ResizeObserver loop error (harmless warning from Mantine/React)
+const resizeObserverErrFilter = (e) => {
+  if (e.message === 'ResizeObserver loop completed with undelivered notifications.') {
+    const resizeObserverErrDiv = document.getElementById('webpack-dev-server-client-overlay-div');
+    const resizeObserverErr = document.getElementById('webpack-dev-server-client-overlay');
+    if (resizeObserverErr) resizeObserverErr.setAttribute('style', 'display: none');
+    if (resizeObserverErrDiv) resizeObserverErrDiv.setAttribute('style', 'display: none');
+  }
+};
+window.addEventListener('error', resizeObserverErrFilter);
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-   <BrowserRouter>
-    <App />
-    </BrowserRouter>
+    <MantineProvider>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </MantineProvider>
   </React.StrictMode>
 );
 

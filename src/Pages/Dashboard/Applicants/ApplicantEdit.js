@@ -1,21 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-	MDBBtn,
-	MDBInput,
-	MDBCheckbox,
-	MDBAccordion,
-	MDBAccordionItem,
-	MDBListGroup,
-	MDBListGroupItem,
-	MDBBadge,
-	MDBModal,
-	MDBModalDialog,
-	MDBModalContent,
-	MDBModalHeader,
-	MDBModalTitle,
-	MDBModalBody,
-	MDBModalFooter
-} from 'mdb-react-ui-kit';
+import { Button, TextInput, Badge, Modal, Group, Text } from '@mantine/core';
 import { useNavigate, useParams } from 'react-router-dom';
 import { editApplicant, getAllJobs, getOneApplication } from '../../../services/api';
 import Mapgl from '../../../Components/Map_gl';
@@ -40,7 +24,7 @@ export default function ApplicantEdit() {
 	const [error, setError] = useState('');
 	const [success, setSuccess] = useState('');
 	const [saveConfirmOpen, setSaveConfirmOpen] = useState(false);
-	const [activeAccordion, setActiveAccordion] = useState(1);
+	const [activeAccordion, setActiveAccordion] = useState(null);
 	const [jobSearchTerm, setJobSearchTerm] = useState('');
 	const [viewJobModalOpen, setViewJobModalOpen] = useState(false);
 	const [selectedJob, setSelectedJob] = useState(null);
@@ -202,7 +186,7 @@ export default function ApplicantEdit() {
 			<form onSubmit={handleSubmit}>
 				<div className="row">
 					<div className="col-md-6 mb-3">
-						<MDBInput
+						<TextInput
 							label="First Name"
 							name="applicant_firstName"
 							type="text"
@@ -212,7 +196,7 @@ export default function ApplicantEdit() {
 					</div>
 
 					<div className="col-md-6 mb-3">
-						<MDBInput
+						<TextInput
 							label="Last Name"
 							name="applicant_lastName"
 							type="text"
@@ -222,7 +206,7 @@ export default function ApplicantEdit() {
 					</div>
 
 					<div className="col-md-6 mb-3">
-						<MDBInput
+						<TextInput
 							label="Title"
 							name="applicant_title"
 							type="text"
@@ -232,7 +216,7 @@ export default function ApplicantEdit() {
 					</div>
 
 					<div className="col-md-6 mb-3">
-						<MDBInput
+						<TextInput
 							label="Applicant Number / License"
 							name="applicant_license"
 							type="text"
@@ -249,55 +233,46 @@ export default function ApplicantEdit() {
 							<p className="text-muted">No jobs linked to this applicant.</p>
 						)}
 						{!jobsLoading && !jobsError && linkedJobs.length > 0 && (
-							<MDBAccordion
-								initialActive={1}
-								active={activeAccordion}
-								onChange={(itemId) => setActiveAccordion(itemId)}
-								className="mb-3"
-							>
-								{linkedJobs.map((job, index) => {
-									const id = getJobId(job);
-									const collapseId = index + 1;
-									return (
-										<MDBAccordionItem
-											key={id || job.job_number || collapseId}
-											collapseId={collapseId}
-											headerTitle={
-												<>
-													{job.job_number ? `Job No. #${job.job_number} ` : 'Job'}
-													<MDBBadge color={job.approved ? 'primary' : 'danger'} className='ms-2'>
-														{job.approved ? 'Approved' : 'Not Approved'}
-													</MDBBadge>
-												</>
-											}
-										>
-											<MDBListGroup className='text-start m-3'>
-												<MDBListGroupItem>
-													<div className='fw-bold'>Address: <span className='fw-normal'>{job.property?.house_num || ''} {job.property?.street_name || ''}</span></div>
-												</MDBListGroupItem>
-												<MDBListGroupItem>
-													<div className='fw-bold'>Borough: <span className='fw-normal'>{job.property?.borough || 'N/A'}</span></div>
-												</MDBListGroupItem>
-												<MDBListGroupItem>
-													<div><div className='fw-bold text-start'>Description:</div><div className='fw-normal'>{job.job_description || 'N/A'}</div></div>
-												</MDBListGroupItem>
-												<MDBListGroupItem>
-													<div className='fw-bold'>Description Status:</div><div className='fw-normal'>{job.job_status_descrp || job.job_status || 'N/A'}</div>
-												</MDBListGroupItem>
-												<MDBListGroupItem>
-													<div className='fw-bold'>Job Type: <span className='fw-normal'>{job.job_type || 'N/A'}</span></div>
-												</MDBListGroupItem>
-											</MDBListGroup>
-										</MDBAccordionItem>
-									);
-								})}
-							</MDBAccordion>
+								<div className="accordion mb-3" id="linkedJobsAccordion">
+									{linkedJobs.map((job, index) => {
+										const id = getJobId(job);
+										const isOpen = activeAccordion === index;
+										return (
+											<div className="accordion-item" key={id || job.job_number || index}>
+												<h2 className="accordion-header">
+													<button
+														className={'accordion-button' + (isOpen ? '' : ' collapsed')}
+														type="button"
+														onClick={() => setActiveAccordion(isOpen ? null : index)}
+													>
+														{job.job_number ? `Job No. #${job.job_number} ` : 'Job'}
+														<Badge color={job.approved ? 'blue' : 'red'} className='ms-2'>
+															{job.approved ? 'Approved' : 'Not Approved'}
+														</Badge>
+													</button>
+												</h2>
+												<div className={'accordion-collapse collapse' + (isOpen ? ' show' : '')}>
+													<div className='accordion-body text-start'>
+														<div className='fw-bold'>Address: <span className='fw-normal'>{job.property?.house_num || ''} {job.property?.street_name || ''}</span></div>
+														<div className='fw-bold'>Borough: <span className='fw-normal'>{job.property?.borough || 'N/A'}</span></div>
+														<div>
+															<div className='fw-bold text-start'>Description:</div>
+															<div className='fw-normal'>{job.job_description || 'N/A'}</div>
+														</div>
+														<div className='fw-bold'>Description Status: <span className='fw-normal'>{job.job_status_descrp || job.job_status || 'N/A'}</span></div>
+														<div className='fw-bold'>Job Type: <span className='fw-normal'>{job.job_type || 'N/A'}</span></div>
+													</div>
+												</div>
+											</div>
+										);
+									})}
+								</div>
 						)}
-						<MDBBtn
-							color="primary"
-							size="sm"
-							type="button"
-							onClick={() =>
+							<Button
+								color="blue"
+								size="sm"
+								type="button"
+								onClick={() =>
 								navigate('/dashboard/jobs/add', {
 									state: {
 										prefillApplicant: {
@@ -312,11 +287,11 @@ export default function ApplicantEdit() {
 							}
 						>
 							Create New Job
-						</MDBBtn>
+						</Button>
 						<hr className="my-3" />
 						<h6>All Jobs (click to link/unlink)</h6>
 						<div className="mb-2">
-							<MDBInput
+							<TextInput
 								label="Search jobs by number, address, borough, or description"
 								type="text"
 								value={jobSearchTerm}
@@ -360,85 +335,75 @@ export default function ApplicantEdit() {
 
 				<div className="row">
 					<div className="col-12">
-						<MDBBtn color="success" type="submit" disabled={saving}>
+						<Button color="green" type="submit" disabled={saving}>
 							{saving ? 'Saving...' : 'Save Changes'}
-						</MDBBtn>
+						</Button>
 					</div>
 				</div>
 			</form>
 
-			<MDBModal open={saveConfirmOpen} setOpen={setSaveConfirmOpen} tabIndex='-1'>
-				<MDBModalDialog size='md'>
-					<MDBModalContent>
-						<MDBModalHeader>
-							<MDBModalTitle>Applicant Saved</MDBModalTitle>
-							<MDBBtn className='btn-close' color='none' onClick={handleContinueEditing}></MDBBtn>
-						</MDBModalHeader>
-						<MDBModalBody>
-							<p className="mb-0">
-								Applicant information has been saved successfully. Would you like to return to the preview page or continue editing?
-							</p>
-						</MDBModalBody>
-						<MDBModalFooter>
-							<MDBBtn color="secondary" onClick={handleContinueEditing}>
-								Continue Editing
-							</MDBBtn>
-							<MDBBtn color="primary" onClick={handleReturnToPreview}>
-								Return to Preview
-							</MDBBtn>
-						</MDBModalFooter>
-					</MDBModalContent>
-				</MDBModalDialog>
-			</MDBModal>
+			<Modal
+				opened={saveConfirmOpen}
+				onClose={handleContinueEditing}
+				size="md"
+				title="Applicant Saved"
+			>
+				<Text>
+					Applicant information has been saved successfully. Would you like to return to the preview page or continue editing?
+				</Text>
+				<Group justify="flex-end" mt="md">
+					<Button color="gray" onClick={handleContinueEditing}>
+						Continue Editing
+					</Button>
+					<Button color="blue" onClick={handleReturnToPreview}>
+						Return to Preview
+					</Button>
+				</Group>
+			</Modal>
 
-			<MDBModal open={viewJobModalOpen} setOpen={setViewJobModalOpen} tabIndex='-1'>
-				<MDBModalDialog size='lg' scrollable>
-					<MDBModalContent>
-						<MDBModalHeader>
-							<MDBModalTitle>Job Details</MDBModalTitle>
-							<MDBBtn className='btn-close' color='none' onClick={() => setViewJobModalOpen(false)}></MDBBtn>
-						</MDBModalHeader>
-						<MDBModalBody>
-							{!selectedJob && <p className="mb-0">No job selected.</p>}
-							{selectedJob && (
-								<>
-									<div className="mb-3">
-										<p><strong>Job Number:</strong> {selectedJob.job_number || 'N/A'}</p>
-										<p><strong>Job Type:</strong> {selectedJob.job_type || 'N/A'}</p>
-										<p><strong>Status:</strong> {selectedJob.job_status_descrp || selectedJob.job_status || 'N/A'}</p>
-										<p><strong>Approved:</strong> {selectedJob.approved ? 'Yes' : 'No'}</p>
-										<p><strong>Description:</strong> {selectedJob.job_description || 'N/A'}</p>
-										<p>
-											<strong>Property:</strong>{' '}
-											{selectedJob.property
-													? `${selectedJob.property.house_num || ''} ${selectedJob.property.street_name || ''}${selectedJob.property.borough ? ', ' + selectedJob.property.borough : ''}`.trim()
-													: 'N/A'}
-										</p>
-									</div>
-									{selectedJob.property && (
-										<Mapgl
-											newLocation={`${selectedJob.property.house_num || ''} ${selectedJob.property.street_name || ''}, ${selectedJob.property.borough || ''}`}
-										/>
-									)}
-								</>
-							)}
-						</MDBModalBody>
-						<MDBModalFooter>
-							{selectedJob && (
-								<MDBBtn
-									color={formData.jobs.includes(getJobId(selectedJob)) ? 'danger' : 'success'}
-									onClick={() => handleToggleJob(selectedJob)}
-								>
-									{formData.jobs.includes(getJobId(selectedJob)) ? 'Unlink Job' : 'Link Job'}
-								</MDBBtn>
-							)}
-							<MDBBtn color="secondary" onClick={() => setViewJobModalOpen(false)}>
-								Close
-							</MDBBtn>
-						</MDBModalFooter>
-					</MDBModalContent>
-				</MDBModalDialog>
-			</MDBModal>
+			<Modal
+				opened={viewJobModalOpen}
+				onClose={() => setViewJobModalOpen(false)}
+				size="lg"
+				title="Job Details"
+			>
+				{!selectedJob && <p className="mb-0">No job selected.</p>}
+				{selectedJob && (
+					<>
+						<div className="mb-3">
+							<p><strong>Job Number:</strong> {selectedJob.job_number || 'N/A'}</p>
+							<p><strong>Job Type:</strong> {selectedJob.job_type || 'N/A'}</p>
+							<p><strong>Status:</strong> {selectedJob.job_status_descrp || selectedJob.job_status || 'N/A'}</p>
+							<p><strong>Approved:</strong> {selectedJob.approved ? 'Yes' : 'No'}</p>
+							<p><strong>Description:</strong> {selectedJob.job_description || 'N/A'}</p>
+							<p>
+								<strong>Property:</strong>{' '}
+								{selectedJob.property
+										? `${selectedJob.property.house_num || ''} ${selectedJob.property.street_name || ''}${selectedJob.property.borough ? ', ' + selectedJob.property.borough : ''}`.trim()
+										: 'N/A'}
+							</p>
+						</div>
+						{selectedJob.property && (
+							<Mapgl
+								newLocation={`${selectedJob.property.house_num || ''} ${selectedJob.property.street_name || ''}, ${selectedJob.property.borough || ''}`}
+							/>
+						)}
+					</>
+				)}
+				<Group justify="space-between" mt="md">
+					{selectedJob && (
+						<Button
+							color={formData.jobs.includes(getJobId(selectedJob)) ? 'red' : 'green'}
+							onClick={() => handleToggleJob(selectedJob)}
+						>
+							{formData.jobs.includes(getJobId(selectedJob)) ? 'Unlink Job' : 'Link Job'}
+						</Button>
+					)}
+					<Button color="gray" onClick={() => setViewJobModalOpen(false)}>
+						Close
+					</Button>
+				</Group>
+			</Modal>
 		</div>
 		</>
 	);

@@ -1,50 +1,50 @@
-import {
-  MDBCollapse,
-  MDBContainer,
-  MDBIcon,
-  MDBNavbar,
-  MDBNavbarBrand,
-  MDBNavbarItem,
-  MDBNavbarLink,
-  MDBNavbarNav,
-  MDBNavbarToggler
-} from 'mdb-react-ui-kit';
-
-import { useState } from 'react';
+import React, { useState } from 'react';
+import { NavLink } from 'react-router-dom';
 
 export default function Navigation() {
-  const [openNavText, setOpenNavText] = useState(false);
-  return (<MDBNavbar expand='lg' light bgColor='light'>
-    <MDBContainer fluid>
-      <MDBNavbarBrand href='/'>NYC Job Portal</MDBNavbarBrand>
-      <MDBNavbarToggler
-        type='button'
-        data-target='#navbarText'
-        aria-controls='navbarText'
-        aria-expanded='false'
-        aria-label='Toggle navigation'
-        onClick={() => setOpenNavText(!openNavText)}
-      >
-        <MDBIcon icon='bars' fas />
-      </MDBNavbarToggler>
-      <MDBCollapse navbar open={openNavText}>
-        <MDBNavbarNav className='mr-auto mb-2 mb-lg-0'>
-          <MDBNavbarItem>
-            <MDBNavbarLink active aria-current='page' href='/'>
-              Home
-            </MDBNavbarLink>
-          </MDBNavbarItem>
-          <MDBNavbarItem>
-            <MDBNavbarLink href='/about'>About</MDBNavbarLink>
-          </MDBNavbarItem>
-          <MDBNavbarItem>
-            <MDBNavbarLink href='/dashboard'>Dashboard</MDBNavbarLink>
-          </MDBNavbarItem>
-        </MDBNavbarNav>
+  const [open, setOpen] = useState(false);
 
-      </MDBCollapse>
-    </MDBContainer>
-  </MDBNavbar>)
+  const linkClass = ({ isActive }) =>
+    'nav-link' + (isActive ? ' active' : '');
 
-    ;
+  return (
+    <nav className="navbar navbar-expand-lg navbar-light bg-light">
+      <div className="container-fluid">
+        <NavLink to="/" className="navbar-brand fw-bold">
+          NYC Job Portal
+        </NavLink>
+
+        <button
+          className="navbar-toggler"
+          type="button"
+          aria-controls="navbarNav"
+          aria-expanded={open}
+          aria-label="Toggle navigation"
+          onClick={() => setOpen(prev => !prev)}
+        >
+          <span className="navbar-toggler-icon" />
+        </button>
+
+        <div className={`collapse navbar-collapse ${open ? 'show' : ''}`} id="navbarNav">
+          <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+            <li className="nav-item">
+              <NavLink to="/" end className={linkClass}>
+                Home
+              </NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink to="/about" className={linkClass}>
+                About
+              </NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink to="/dashboard" className={linkClass}>
+                Dashboard
+              </NavLink>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  );
 }

@@ -1,19 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import {
-  MDBBtn,
-  MDBInput,
-  MDBTextArea,
-  MDBCheckbox,
-  MDBSelect,
-  MDBModal,
-  MDBModalDialog,
-  MDBModalContent,
-  MDBModalHeader,
-  MDBModalTitle,
-  MDBModalBody,
-  MDBModalFooter
-} from 'mdb-react-ui-kit';
+import { Button, TextInput, Textarea, Checkbox, Select, Modal, Group, Text, Container, Grid, Card, Stack, UnstyledButton } from '@mantine/core';
 import Mapgl from '../../../Components/Map_gl';
 import { addJob, getJobStatusMapping, getNewJobNumber, getJobTypes, getAllContractorsShort, getAllApplications, searchProperties } from '../../../services/api';
 
@@ -177,15 +164,23 @@ export default function JobsAdd() {
     const house = prop.house_num || prop.house_number || prop.house || '';
     const street = prop.street_name || prop.street || prop.primary_street || '';
     const borough = prop.borough || prop.city || '';
-    const bbl = prop.bbl || '';
 
     const address = `${house} ${street}`.trim();
-    const parts = [address, borough, bbl].filter(Boolean);
+    
+    // Show address and borough when available
+    if (address && borough) {
+      return `${address}, ${borough}`;
+    }
+    if (address) {
+      return address;
+    }
+    if (borough) {
+      return borough;
+    }
 
-    if (parts.length > 0) return parts.join(' - ');
-
-    const id = prop.propertyID || prop.property_id || prop._id;
-    return id || '';
+    // Only show ID as last resort
+    const id = prop.propertyID || prop.property_id || prop._id || prop.bbl;
+    return id || 'Unknown Property';
   };
 
   // ANCHOR Helper to derive property owner name
@@ -550,359 +545,352 @@ export default function JobsAdd() {
   });
 
   return (
-    <div className="container mt-5">
-      <h2 className="mb-4">Add New Job</h2>
+    <>
+    <Container className="mt-4">
+    <Grid className="justify-content-center">
+      <Grid.Col span={{ base: 12, md: 10, lg: 8 }}>
+      <Card className="p-4">
+        <div className="text-center pb-3 border-bottom mb-4">
+        <h2 className="mb-0">Add New Job</h2>
+        </div>
+        <div className="p-1">
+        {error && <div className="alert alert-danger">{error}</div>}
+        {success && <div className="alert alert-success">{success}</div>}
 
-      {error && <div className="alert alert-danger">{error}</div>}
-      {success && <div className="alert alert-success">{success}</div>}
-
-      <form onSubmit={handleSubmit}>
-        <div className="row">
+        <form onSubmit={handleSubmit}>
+          <Grid className="mb-3" gutter="md">
           {/* Job Number - Required */}
-          <div className="col-md-6 mb-3">
-            <MDBInput
-              label="Job Number *"
-              name="job_number"
-              type="text"
-              value={formData.job_number || newJobNumber}
-              onChange={handleChange}
-              required
-              disabled
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <TextInput
+            label="Job Number *"
+            name="job_number"
+            type="text"
+            value={formData.job_number || newJobNumber}
+            onChange={handleChange}
+            required
+            disabled
             />
-          </div>
+          </Grid.Col>
 
-          {/*  ANCHOR Job Type */}
-          <div className="col-md-6 mb-3">
-            <div className="form-outline">
-              <MDBSelect
-                label="Job Type"
-                data={[
-                  { text: 'Select Job Type', value: '' },
-                  ...jobTypes.map((jt) => ({
-                    text: `${jt.job_type} - ${jt.label}`,
-                    value: jt.job_type
-                  }))
-                ]}
-                value={formData.job_type}
-                onChange={handleJobTypeChange}
-              />
-            </div>
-          </div>
-
-          {/*  ANCHOR Prefiling Date */}
-          <div className="col-md-6 mb-3">
-            <MDBInput
-              label="Prefiling Date"
-              name="prefiling_date"
-              type="date"
-              value={formData.prefiling_date}
-              onChange={handleChange}
+          {/* Job Type */}
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <Select
+            label="Job Type"
+            placeholder="Select Job Type"
+            data={jobTypes.map((jt) => ({
+              value: jt.job_type,
+              label: `${jt.job_type} - ${jt.label}`
+            }))}
+            value={formData.job_type}
+            onChange={handleJobTypeChange}
             />
-          </div>
+          </Grid.Col>
 
-          {/*  ANCHOR Latest Action Date */}
-          <div className="col-md-6 mb-3">
-            <MDBInput
-              label="Latest Action Date"
-              name="latest_action_date"
-              type="date"
-              value={formData.latest_action_date}
-              onChange={handleChange}
+          {/* Prefiling Date */}
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <TextInput
+            label="Prefiling Date"
+            name="prefiling_date"
+            type="date"
+            value={formData.prefiling_date}
+            onChange={handleChange}
             />
-          </div>
+          </Grid.Col>
 
-          {/*  ANCHOR Job Status */}
-          <div className="col-md-6 mb-3">
-            <div className="form-outline">
-              <MDBSelect
-                label="Job Status"
-                data={[
-                  { text: 'Select Job Status', value: '' },
-                  ...jobStatusMapping.map((status) => ({
-                    text: `${status.job_status} - ${status.job_status_short}`,
-                    value: status.job_status
-                  }))
-                ]}
-                value={formData.job_status}
-                onChange={handleStatusChange}
-              />
-            </div>
-          </div>
-
-          {/*  ANCHOR Job Status Description */}
-          <div className="col-md-6 mb-3">
-            <MDBInput
-              label="Job Status Description"
-              name="job_status_descrp"
-              type="text"
-              value={formData.job_status_descrp}
-              onChange={handleChange}
-              disabled
+          {/* Latest Action Date */}
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <TextInput
+            label="Latest Action Date"
+            name="latest_action_date"
+            type="date"
+            value={formData.latest_action_date}
+            onChange={handleChange}
             />
-          </div>
+          </Grid.Col>
 
-          {/*  ANCHOR Application Number */}
-          <div className="col-md-6 mb-3">
-            <MDBInput
-              label="Application Number"
-              name="application_num"
-              type="text"
-              value={applicationNumberDisplay}
-              onChange={handleChange}
-              readOnly
-              onClick={openApplicantModal}
+          {/* Job Status */}
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <Select
+            label="Job Status"
+            placeholder="Select Job Status"
+            data={jobStatusMapping.map((status) => ({
+              value: status.job_status,
+              label: `${status.job_status} - ${status.job_status_short}`
+            }))}
+            value={formData.job_status}
+            onChange={handleStatusChange}
+            />
+          </Grid.Col>
+
+          {/* Job Status Description */}
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <TextInput
+            label="Job Status Description"
+            name="job_status_descrp"
+            type="text"
+            value={formData.job_status_descrp}
+            onChange={handleChange}
+            disabled
+            />
+          </Grid.Col>
+
+          {/* Application Number */}
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <TextInput
+            label="Application Number"
+            name="application_num"
+            type="text"
+            value={applicationNumberDisplay}
+            onChange={handleChange}
+            readOnly
+            onClick={openApplicantModal}
             />
             <div className="mt-2">
-              <MDBBtn color="primary" size="sm" type="button" onClick={openApplicantModal}>
-                Search & Select Applicant
-              </MDBBtn>
+            <Button color="blue" size="xs" type="button" onClick={openApplicantModal}>
+              Search &amp; Select Applicant
+            </Button>
             </div>
-          </div>
+          </Grid.Col>
 
-          {/*  ANCHOR Application ID */}
-          <div className="col-md-6 mb-3">
-            <MDBInput
-              label="Application ID"
-              name="application_id"
-              type="text"
-              value={applicationIdDisplay}
-              onChange={handleChange}
-              readOnly
-              onClick={openApplicantModal}
+          {/* Application ID */}
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <TextInput
+            label="Application ID"
+            name="application_id"
+            type="text"
+            value={applicationIdDisplay}
+            onChange={handleChange}
+            readOnly
+            onClick={openApplicantModal}
             />
-          </div>
+          </Grid.Col>
 
-          {/*  ANCHOR Applicant First Name (display) */}
-          <div className="col-md-6 mb-3">
-            <MDBInput
-              label="Applicant First Name"
-              name="applicant_firstName"
-              type="text"
-              value={applicantFirst || formData.applicant_firstName}
-              readOnly
+          {/* Applicant First Name (display) */}
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <TextInput
+            label="Applicant First Name"
+            name="applicant_firstName"
+            type="text"
+            value={applicantFirst || formData.applicant_firstName}
+            readOnly
             />
-          </div>
+          </Grid.Col>
 
-          {/*  ANCHOR Applicant Last Name (display) */}
-          <div className="col-md-6 mb-3">
-            <MDBInput
-              label="Applicant Last Name"
-              name="applicant_lastName"
-              type="text"
-              value={applicantLast || formData.applicant_lastName}
-              readOnly
+          {/* Applicant Last Name (display) */}
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <TextInput
+            label="Applicant Last Name"
+            name="applicant_lastName"
+            type="text"
+            value={applicantLast || formData.applicant_lastName}
+            readOnly
             />
-          </div>
+          </Grid.Col>
 
-          {/*  ANCHOR Applicant License Number (display) */}
-          <div className="col-md-6 mb-3">
-            <MDBInput
-              label="Applicant License Number"
-              name="applicant_license"
-              type="text"
-              value={
-                (selectedApplicant &&
-                  (selectedApplicant.applicant_license ||
-                   selectedApplicant.license ||
-                   selectedApplicant.license_num)) ||
-                formData.applicant_license
-              }
-              readOnly
+          {/* Applicant License Number (display) */}
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <TextInput
+            label="Applicant License Number"
+            name="applicant_license"
+            type="text"
+            value={
+              (selectedApplicant &&
+              (selectedApplicant.applicant_license ||
+               selectedApplicant.license ||
+               selectedApplicant.license_num)) ||
+              formData.applicant_license
+            }
+            readOnly
             />
-          </div>
+          </Grid.Col>
 
-
-
-          {/*  ANCHOR Job Description */}
-          <div className="col-md-6 mb-3">
-            <MDBTextArea
-              label="Job Description"
-              name="job_description"
-              value={formData.job_description}
-              onChange={handleChange}
-              rows={3}
+          {/* Job Description */}
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <Textarea
+            label="Job Description"
+            name="job_description"
+            value={formData.job_description}
+            onChange={handleChange}
+            rows={3}
             />
-          </div>
+          </Grid.Col>
 
-          {/*  ANCHOR Other Description */}
-          <div className="col-md-6 mb-3">
-            <MDBTextArea
-              label="Other Description"
-              name="other_description"
-              value={formData.other_description}
-              onChange={handleChange}
-              rows={3}
+          {/* Other Description */}
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <Textarea
+            label="Other Description"
+            name="other_description"
+            value={formData.other_description}
+            onChange={handleChange}
+            rows={3}
             />
-          </div>
+          </Grid.Col>
 
-          {/*  ANCHOR Professional Cert */}
-          <div className="col-md-6 mb-3">
-            <MDBInput
-              label="Professional Cert"
-              name="professional_cert"
-              type="text"
-              value={formData.professional_cert}
-              onChange={handleChange}
+          {/* Professional Cert */}
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <TextInput
+            label="Professional Cert"
+            name="professional_cert"
+            type="text"
+            value={formData.professional_cert}
+            onChange={handleChange}
             />
-          </div>
+          </Grid.Col>
 
-          {/*  ANCHOR Contractors */}
-          <div className="col-md-6 mb-3">
-            <MDBInput
-              label="Contractors"
-              name="contractors"
-              type="text"
-              value={selectedContractorLabels.join(', ')}
-              readOnly
-              onClick={openContractorModal}
+          {/* Contractors */}
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <TextInput
+            label="Contractors"
+            name="contractors"
+            type="text"
+            value={selectedContractorLabels.join(', ')}
+            readOnly
+            onClick={openContractorModal}
             />
             <div className="mt-2">
-              <MDBBtn color="primary" size="sm" type="button" onClick={openContractorModal}>
-                Search & Add Contractor
-              </MDBBtn>
+            <Button color="blue" size="xs" type="button" onClick={openContractorModal}>
+              Search &amp; Add Contractor
+            </Button>
             </div>
-          </div>
+          </Grid.Col>
 
-          {/*  ANCHOR Initial Cost */}
-          <div className="col-md-6 mb-3">
-            <MDBInput
-              label="Initial Cost"
-              name="initial_cost"
-              type="number"
-              step="0.01"
-              value={formData.initial_cost}
-              onChange={handleChange}
+          {/* Initial Cost */}
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <TextInput
+            label="Initial Cost"
+            name="initial_cost"
+            type="number"
+            step="0.01"
+            value={formData.initial_cost}
+            onChange={handleChange}
             />
-          </div>
+          </Grid.Col>
 
-          {/*  ANCHOR Total Est Fee */}
-          <div className="col-md-6 mb-3">
-            <MDBInput
-              label="Total Estimated Fee"
-              name="total_est__fee"
-              type="number"
-              step="0.01"
-              value={formData.total_est__fee}
-              onChange={handleChange}
+          {/* Total Est Fee */}
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <TextInput
+            label="Total Estimated Fee"
+            name="total_est__fee"
+            type="number"
+            step="0.01"
+            value={formData.total_est__fee}
+            onChange={handleChange}
             />
-          </div>
+          </Grid.Col>
 
-          {/*  ANCHOR Approved Date */}
-          <div className="col-md-6 mb-3">
-            <MDBInput
-              label="Approved Date"
-              name="approved_date"
-              type="date"
-              value={formData.approved_date}
-              onChange={handleChange}
+          {/* Approved Date */}
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <TextInput
+            label="Approved Date"
+            name="approved_date"
+            type="date"
+            value={formData.approved_date}
+            onChange={handleChange}
             />
-          </div>
+          </Grid.Col>
 
-          {/*  ANCHOR Paid Date */}
-          <div className="col-md-6 mb-3">
-            <MDBInput
-              label="Paid Date"
-              name="paid"
-              type="date"
-              value={formData.paid}
-              onChange={handleChange}
+          {/* Paid Date */}
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <TextInput
+            label="Paid Date"
+            name="paid"
+            type="date"
+            value={formData.paid}
+            onChange={handleChange}
             />
-          </div>
+          </Grid.Col>
 
-          {/*  ANCHOR Fully Permitted Date */}
-          <div className="col-md-6 mb-3">
-            <MDBInput
-              label="Fully Permitted Date"
-              name="fully_permitted"
-              type="date"
-              value={formData.fully_permitted}
-              onChange={handleChange}
+          {/* Fully Permitted Date */}
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <TextInput
+            label="Fully Permitted Date"
+            name="fully_permitted"
+            type="date"
+            value={formData.fully_permitted}
+            onChange={handleChange}
             />
-          </div>
+          </Grid.Col>
 
-          {/*  ANCHOR Approved */}
-          <div className="col-md-6 mb-3">
-            <MDBCheckbox
-              name="approved"
-              label="Approved"
-              checked={formData.approved}
-              onChange={handleChange}
+          {/* Approved */}
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <Checkbox
+            name="approved"
+            label="Approved"
+            checked={formData.approved}
+            onChange={handleChange}
             />
-          </div>
+          </Grid.Col>
 
-          {/*  ANCHOR Property Address */}
-          <div className="col-md-6 mb-3">
-            <MDBInput
-              label="Property Address"
-              name="propertyID"
-              type="text"
-              value={propertyDisplay}
-              onChange={handleChange}
-              readOnly
-              onClick={openPropertyModal}
+          {/* Property Address */}
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <TextInput
+            label="Property Address"
+            name="propertyID"
+            type="text"
+            value={propertyDisplay}
+            onChange={handleChange}
+            readOnly
+            onClick={openPropertyModal}
             />
             <div className="mt-2">
-              <MDBBtn color="primary" size="sm" type="button" onClick={openPropertyModal}>
-                Search & Select Property
-              </MDBBtn>
+            <Button color="blue" size="xs" type="button" onClick={openPropertyModal}>
+              Search &amp; Select Property
+            </Button>
             </div>
-          </div>
+          </Grid.Col>
 
-          {/*  ANCHOR Property Owner Name (derived from property record) */}
-          <div className="col-md-6 mb-3">
-            <MDBInput
-              label="Property Owner Name"
-              name="property_owner_name"
-              type="text"
-              value={propertyOwnerName}
-              readOnly
+          {/* Property Owner Name (derived from property record) */}
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <TextInput
+            label="Property Owner Name"
+            name="property_owner_name"
+            type="text"
+            value={propertyOwnerName}
+            readOnly
             />
-          </div>
+          </Grid.Col>
 
-          {/*  ANCHOR Property Details & Map */}
+          {/* Property Details & Map */}
           {selectedProperty && (
-            <div className="col-12 mb-4">
-              <div className="card">
-                <div className="card-body">
-                  <h5 className="card-title mb-3">Property Details</h5>
-                  {propertyAddressLine && (
-                    <p className="mb-1">
-                      <strong>Address:</strong> {propertyAddressLine}
-                      {propertyBorough && `, ${propertyBorough}, NY`}
-                    </p>
-                  )}
-                  {propertyOwnerName && (
-                    <p className="mb-3">
-                      <strong>Owner:</strong> {propertyOwnerName}
-                    </p>
-                  )}
-                  <Mapgl newLocation={propertyMapLocation} />
-                </div>
+            <Grid.Col span={12} className="mb-4">
+            <div className="card">
+              <div className="card-body">
+              <h5 className="card-title mb-3">Property Details</h5>
+              {propertyAddressLine && (
+                <p className="mb-1">
+                <strong>Address:</strong> {propertyAddressLine}
+                {propertyBorough && `, ${propertyBorough}, NY`}
+                </p>
+              )}
+              {propertyOwnerName && (
+                <p className="mb-3">
+                <strong>Owner:</strong> {propertyOwnerName}
+                </p>
+              )}
+              <Mapgl newLocation={propertyMapLocation} />
               </div>
             </div>
+            </Grid.Col>
           )}
+          </Grid>
 
+          {/* Submit Button */}
+          <Grid className="mt-4">
+          <Grid.Col className="d-flex justify-content-end">
+            <Button color="green" type="submit" disabled={loading}>
+            {loading ? 'Creating...' : 'Create Job'}
+            </Button>
+          </Grid.Col>
+          </Grid>
+        </form>
         </div>
-
-        {/*  ANCHOR Submit Button */}
-        <div className="row">
-          <div className="col-12">
-            <MDBBtn color="success" type="submit" disabled={loading}>
-              {loading ? 'Creating...' : 'Create Job'}
-            </MDBBtn>
-          </div>
-        </div>
-      </form>
+      </Card>
+      </Grid.Col>
+    </Grid>
+    </Container>
       {/* Property selection modal */}
-      <MDBModal open={propertyModalOpen} setOpen={setPropertyModalOpen} tabIndex='-1'>
-        <MDBModalDialog size='lg' scrollable>
-          <MDBModalContent>
-            <MDBModalHeader>
-              <MDBModalTitle>Select Property</MDBModalTitle>
-              <MDBBtn className='btn-close' color='none' onClick={() => setPropertyModalOpen(false)}></MDBBtn>
-            </MDBModalHeader>
-            <MDBModalBody>
-              <MDBInput
+      <Modal opened={propertyModalOpen} onClose={() => setPropertyModalOpen(false)} size='lg' title="Select Property">
+            <TextInput
                 label="Search property"
                 type="text"
                 value={propertySearch}
@@ -911,44 +899,50 @@ export default function JobsAdd() {
               {propertiesLoading && <p className="mt-3">Searching properties...</p>}
               {propertiesError && <p className="mt-3 text-danger">{propertiesError}</p>}
               {!propertiesLoading && !propertiesError && propertiesList.length > 0 && (
-                <div className="list-group mt-3" style={{ maxHeight: '400px', overflowY: 'auto' }}>
+                <Stack gap="xs" mt="md" style={{ maxHeight: '400px', overflowY: 'auto' }}>
                   {propertiesList.map((p, idx) => {
                     const label = formatPropertyLabel(p);
                     return (
-                      <button
+                      <UnstyledButton
                         key={p.propertyID || p.property_id || p._id || idx}
-                        type="button"
-                        className="list-group-item list-group-item-action"
                         onClick={() => handleSelectProperty(p)}
+                        style={{
+                          padding: '10px 15px',
+                          border: '1px solid #dee2e6',
+                          borderRadius: '4px',
+                          backgroundColor: '#fff',
+                          textAlign: 'left',
+                          width: '100%',
+                          cursor: 'pointer',
+                          transition: 'all 0.15s ease'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = '#f8f9fa';
+                          e.currentTarget.style.borderColor = '#0d6efd';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = '#fff';
+                          e.currentTarget.style.borderColor = '#dee2e6';
+                        }}
                       >
                         {label}
-                      </button>
+                      </UnstyledButton>
                     );
                   })}
-                </div>
+                </Stack>
               )}
               {!propertiesLoading && !propertiesError && propertiesList.length === 0 && propertySearch.trim() && (
                 <div className="mt-3 text-muted small">No properties found.</div>
               )}
-            </MDBModalBody>
-            <MDBModalFooter>
-              <MDBBtn color="secondary" onClick={() => setPropertyModalOpen(false)}>
+            <Group justify="flex-end" mt="md">
+              <Button color="gray" onClick={() => setPropertyModalOpen(false)}>
                 Close
-              </MDBBtn>
-            </MDBModalFooter>
-          </MDBModalContent>
-        </MDBModalDialog>
-      </MDBModal>
+              </Button>
+            </Group>
+      </Modal>
       {/* Applicant selection modal */}
-      <MDBModal open={applicantModalOpen} setOpen={setApplicantModalOpen} tabIndex='-1'>
-        <MDBModalDialog size='lg' scrollable>
-          <MDBModalContent>
-            <MDBModalHeader>
-              <MDBModalTitle>Select Applicant</MDBModalTitle>
-              <MDBBtn className='btn-close' color='none' onClick={() => setApplicantModalOpen(false)}></MDBBtn>
-            </MDBModalHeader>
-            <MDBModalBody>
-              <MDBInput
+      <Modal opened={applicantModalOpen} onClose={() => setApplicantModalOpen(false)} size='lg' title="Select Applicant">
+              <TextInput
                 label="Search applicant"
                 type="text"
                 value={applicantSearch}
@@ -957,43 +951,49 @@ export default function JobsAdd() {
               {applicantsLoading && <p className="mt-3">Loading applicants...</p>}
               {applicantsError && <p className="mt-3 text-danger">{applicantsError}</p>}
               {!applicantsLoading && !applicantsError && (
-                <div className="list-group mt-3" style={{ maxHeight: '400px', overflowY: 'auto' }}>
+                <Stack gap="xs" mt="md" style={{ maxHeight: '400px', overflowY: 'auto' }}>
                   {filteredApplicants.map((a, idx) => {
                     const label = formatApplicantLabel(a);
                     return (
-                      <button
+                      <UnstyledButton
                         key={a.application_id || a._id || a.application_num || idx}
-                        type="button"
-                        className="list-group-item list-group-item-action"
                         onClick={() => handleSelectApplicant(a)}
+                        style={{
+                          padding: '10px 15px',
+                          border: '1px solid #dee2e6',
+                          borderRadius: '4px',
+                          backgroundColor: '#fff',
+                          textAlign: 'left',
+                          width: '100%',
+                          cursor: 'pointer',
+                          transition: 'all 0.15s ease'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = '#f8f9fa';
+                          e.currentTarget.style.borderColor = '#0d6efd';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = '#fff';
+                          e.currentTarget.style.borderColor = '#dee2e6';
+                        }}
                       >
                         {label}
-                      </button>
+                      </UnstyledButton>
                     );
                   })}
                   {filteredApplicants.length === 0 && (
-                    <div className="text-muted small">No applicants found.</div>
+                    <Text size="sm" c="dimmed">No applicants found.</Text>
                   )}
-                </div>
+                </Stack>
               )}
-            </MDBModalBody>
-            <MDBModalFooter>
-              <MDBBtn color="secondary" onClick={() => setApplicantModalOpen(false)}>
+            <Group justify="flex-end" mt="md">
+              <Button color="gray" onClick={() => setApplicantModalOpen(false)}>
                 Close
-              </MDBBtn>
-            </MDBModalFooter>
-          </MDBModalContent>
-        </MDBModalDialog>
-      </MDBModal>
-      <MDBModal open={contractorModalOpen} setOpen={setContractorModalOpen} tabIndex='-1'>
-        <MDBModalDialog size='lg' scrollable>
-          <MDBModalContent>
-            <MDBModalHeader>
-              <MDBModalTitle>Select Contractor</MDBModalTitle>
-              <MDBBtn className='btn-close' color='none' onClick={() => setContractorModalOpen(false)}></MDBBtn>
-            </MDBModalHeader>
-            <MDBModalBody>
-              <MDBInput
+              </Button>
+            </Group>
+      </Modal>
+      <Modal opened={contractorModalOpen} onClose={() => setContractorModalOpen(false)} size='lg' title="Select Contractor">
+              <TextInput
                 label="Search contractor"
                 type="text"
                 value={contractorSearch}
@@ -1002,37 +1002,58 @@ export default function JobsAdd() {
               {contractorsLoading && <p className="mt-3">Loading contractors...</p>}
               {contractorsError && <p className="mt-3 text-danger">{contractorsError}</p>}
               {!contractorsLoading && !contractorsError && (
-                <div className="list-group mt-3" style={{ maxHeight: '400px', overflowY: 'auto' }}>
+                <Stack gap="xs" mt="md" style={{ maxHeight: '400px', overflowY: 'auto' }}>
                   {filteredContractors.map((c, idx) => {
                     const label = formatContractorLabel(c);
                     const cid = getContractorId(c);
                     const isSelected = cid ? formData.contractors.includes(cid) : false;
                     return (
-                      <button
+                      <UnstyledButton
                         key={c._id || c.contractor_id || c.id || label || idx}
-                        type="button"
-                        className={`list-group-item list-group-item-action d-flex justify-content-between align-items-center ${isSelected ? 'active' : ''}`}
                         onClick={() => handleAddContractor(c)}
+                        style={{
+                          padding: '10px 15px',
+                          border: '1px solid #dee2e6',
+                          borderRadius: '4px',
+                          backgroundColor: isSelected ? '#0d6efd' : '#fff',
+                          color: isSelected ? '#fff' : '#000',
+                          textAlign: 'left',
+                          width: '100%',
+                          cursor: 'pointer',
+                          transition: 'all 0.15s ease',
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center'
+                        }}
+                        onMouseEnter={(e) => {
+                          if (!isSelected) {
+                            e.currentTarget.style.backgroundColor = '#f8f9fa';
+                            e.currentTarget.style.borderColor = '#0d6efd';
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          if (!isSelected) {
+                            e.currentTarget.style.backgroundColor = '#fff';
+                            e.currentTarget.style.borderColor = '#dee2e6';
+                          }
+                        }}
                       >
                         <span>{label}</span>
-                        {isSelected && <span className="badge bg-light text-dark">Selected</span>}
-                      </button>
+                        {isSelected && <span style={{ fontSize: '0.875rem', padding: '2px 8px', borderRadius: '4px', backgroundColor: '#fff', color: '#0d6efd' }}>Selected</span>}
+                      </UnstyledButton>
                     );
                   })}
                   {filteredContractors.length === 0 && (
-                    <div className="text-muted small">No contractors found.</div>
+                    <Text size="sm" c="dimmed">No contractors found.</Text>
                   )}
-                </div>
+                </Stack>
               )}
-            </MDBModalBody>
-            <MDBModalFooter>
-              <MDBBtn color="secondary" onClick={() => setContractorModalOpen(false)}>
+            <Group justify="flex-end" mt="md">
+              <Button color="gray" onClick={() => setContractorModalOpen(false)}>
                 Close
-              </MDBBtn>
-            </MDBModalFooter>
-          </MDBModalContent>
-        </MDBModalDialog>
-      </MDBModal>
-    </div>
+              </Button>
+            </Group>
+      </Modal>
+        </>
   );
 }

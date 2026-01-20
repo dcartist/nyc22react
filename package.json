@@ -16,7 +16,6 @@
     "axios": "^1.10.0",
     "mapbox": "^1.0.0-beta10",
     "mapbox-gl": "^3.15.0",
-    "mdb-react-ui-kit": "git+https://oauth2:PR_yk3L6rpyjdsP4EFrF@git.mdbootstrap.com/mdb/react/mdb5/prd/mdb5-react-ui-kit-pro-advanced",
     "react": "^19.1.0",
     "react-data-table-component": "^7.7.0",
     "react-dom": "^19.1.0",
@@ -26,6 +25,9 @@
     "react-router-dom": "^7.6.3",
     "react-scripts": "5.0.1",
     "styled-components": "^6.1.19",
+    "@mantine/core": "^7.16.1",
+    "@mantine/hooks": "^7.16.1",
+    "bootstrap": "^5.3.3",
     "web-vitals": "^2.1.4"
   },
   "scripts": {

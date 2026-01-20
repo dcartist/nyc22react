@@ -1,18 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-	MDBBtn,
-	MDBInput,
-	MDBTextArea,
-	MDBCheckbox,
-	MDBSelect,
-	MDBModal,
-	MDBModalDialog,
-	MDBModalContent,
-	MDBModalHeader,
-	MDBModalTitle,
-	MDBModalBody,
-	MDBModalFooter
-} from 'mdb-react-ui-kit';
+import { Button, TextInput, Textarea, Checkbox, Select, Modal, Group, Text } from '@mantine/core';
 import { useNavigate, useParams } from 'react-router-dom';
 import Mapgl from '../../../Components/Map_gl';
 import {
@@ -183,15 +170,23 @@ export default function JobEdit() {
 		const house = prop.house_num || prop.house_number || prop.house || '';
 		const street = prop.street_name || prop.street || prop.primary_street || '';
 		const borough = prop.borough || prop.city || '';
-		const bbl = prop.bbl || '';
 
 		const address = `${house} ${street}`.trim();
-		const parts = [address, borough, bbl].filter(Boolean);
+		
+		// Show address and borough when available
+		if (address && borough) {
+			return `${address}, ${borough}`;
+		}
+		if (address) {
+			return address;
+		}
+		if (borough) {
+			return borough;
+		}
 
-		if (parts.length > 0) return parts.join(' - ');
-
-		const id = prop.propertyID || prop.property_id || prop._id;
-		return id || '';
+		// Only show ID as last resort
+		const id = prop.propertyID || prop.property_id || prop._id || prop.bbl;
+		return id || 'Unknown Property';
 	};
 
 	const getPropertyOwnerName = (prop) => {
@@ -610,7 +605,7 @@ export default function JobEdit() {
 			<form onSubmit={handleSubmit}>
 				<div className="row">
 					<div className="col-md-6 mb-3">
-						<MDBInput
+						<TextInput
 							label="Job Number *"
 							name="job_number"
 							type="text"
@@ -623,15 +618,13 @@ export default function JobEdit() {
 
 					<div className="col-md-6 mb-3">
 						<div className="form-outline">
-							<MDBSelect
+							<Select
 								label="Job Type"
-								data={[
-									{ text: 'Select Job Type', value: '' },
-									...jobTypes.map((jt) => ({
-										text: `${jt.job_type} - ${jt.label}`,
-										value: jt.job_type
-									}))
-								]}
+								placeholder="Select Job Type"
+								data={jobTypes.map((jt) => ({
+									value: jt.job_type,
+									label: `${jt.job_type} - ${jt.label}`
+								}))}
 								value={formData.job_type}
 								onChange={handleJobTypeChange}
 							/>
@@ -639,7 +632,7 @@ export default function JobEdit() {
 					</div>
 
 					<div className="col-md-6 mb-3">
-						<MDBInput
+						<TextInput
 							label="Prefiling Date"
 							name="prefiling_date"
 							type="date"
@@ -649,7 +642,7 @@ export default function JobEdit() {
 					</div>
 
 					<div className="col-md-6 mb-3">
-						<MDBInput
+						<TextInput
 							label="Latest Action Date"
 							name="latest_action_date"
 							type="date"
@@ -660,15 +653,13 @@ export default function JobEdit() {
 
 					<div className="col-md-6 mb-3">
 						<div className="form-outline">
-							<MDBSelect
+							<Select
 								label="Job Status"
-								data={[
-									{ text: 'Select Job Status', value: '' },
-									...jobStatusMapping.map((status) => ({
-										text: `${status.job_status} - ${status.job_status_short}`,
-										value: status.job_status
-									}))
-								]}
+								placeholder="Select Job Status"
+								data={jobStatusMapping.map((status) => ({
+									value: status.job_status,
+									label: `${status.job_status} - ${status.job_status_short}`
+								}))}
 								value={formData.job_status}
 								onChange={handleStatusChange}
 							/>
@@ -676,7 +667,7 @@ export default function JobEdit() {
 					</div>
 
 					<div className="col-md-6 mb-3">
-						<MDBInput
+						<TextInput
 							label="Job Status Description"
 							name="job_status_descrp"
 							type="text"
@@ -687,7 +678,7 @@ export default function JobEdit() {
 					</div>
 
 					<div className="col-md-6 mb-3">
-						<MDBInput
+						<TextInput
 							label="Application Number"
 							name="application_num"
 							type="text"
@@ -697,14 +688,14 @@ export default function JobEdit() {
 							onClick={openApplicantModal}
 						/>
 						<div className="mt-2">
-							<MDBBtn color="primary" size="sm" type="button" onClick={openApplicantModal}>
+							<Button color="blue" size="xs" type="button" onClick={openApplicantModal}>
 								Search &amp; Select Applicant
-							</MDBBtn>
+							</Button>
 						</div>
 					</div>
 
 					<div className="col-md-6 mb-3">
-						<MDBInput
+						<TextInput
 							label="Application ID"
 							name="application_id"
 							type="text"
@@ -716,7 +707,7 @@ export default function JobEdit() {
 					</div>
 
 					<div className="col-md-6 mb-3">
-						<MDBTextArea
+						<Textarea
 							label="Job Description"
 							name="job_description"
 							value={formData.job_description}
@@ -726,7 +717,7 @@ export default function JobEdit() {
 					</div>
 
 					<div className="col-md-6 mb-3">
-						<MDBTextArea
+						<Textarea
 							label="Other Description"
 							name="other_description"
 							value={formData.other_description}
@@ -736,7 +727,7 @@ export default function JobEdit() {
 					</div>
 
 					<div className="col-md-6 mb-3">
-						<MDBInput
+						<TextInput
 							label="Professional Cert"
 							name="professional_cert"
 							type="text"
@@ -746,7 +737,7 @@ export default function JobEdit() {
 					</div>
 
 					<div className="col-md-6 mb-3">
-						<MDBInput
+						<TextInput
 							label="Contractors"
 							name="contractors"
 							type="text"
@@ -755,14 +746,14 @@ export default function JobEdit() {
 							onClick={openContractorModal}
 						/>
 						<div className="mt-2">
-							<MDBBtn color="primary" size="sm" type="button" onClick={openContractorModal}>
+							<Button color="blue" size="xs" type="button" onClick={openContractorModal}>
 								Search &amp; Edit Contractors
-							</MDBBtn>
+							</Button>
 						</div>
 					</div>
 
 					<div className="col-md-6 mb-3">
-						<MDBInput
+						<TextInput
 							label="Initial Cost"
 							name="initial_cost"
 							type="number"
@@ -773,7 +764,7 @@ export default function JobEdit() {
 					</div>
 
 					<div className="col-md-6 mb-3">
-						<MDBInput
+						<TextInput
 							label="Total Estimated Fee"
 							name="total_est__fee"
 							type="number"
@@ -784,7 +775,7 @@ export default function JobEdit() {
 					</div>
 
 					<div className="col-md-6 mb-3">
-						<MDBInput
+						<TextInput
 							label="Approved Date"
 							name="approved_date"
 							type="date"
@@ -794,7 +785,7 @@ export default function JobEdit() {
 					</div>
 
 					<div className="col-md-6 mb-3">
-						<MDBInput
+						<TextInput
 							label="Paid Date"
 							name="paid"
 							type="date"
@@ -804,7 +795,7 @@ export default function JobEdit() {
 					</div>
 
 					<div className="col-md-6 mb-3">
-						<MDBInput
+						<TextInput
 							label="Fully Permitted Date"
 							name="fully_permitted"
 							type="date"
@@ -814,7 +805,7 @@ export default function JobEdit() {
 					</div>
 
 					<div className="col-md-6 mb-3">
-						<MDBCheckbox
+						<Checkbox
 							name="approved"
 							label="Approved"
 							checked={formData.approved}
@@ -823,7 +814,7 @@ export default function JobEdit() {
 					</div>
 
 					<div className="col-md-6 mb-3">
-						<MDBInput
+						<TextInput
 							label="Property Address"
 							name="propertyID"
 							type="text"
@@ -833,14 +824,14 @@ export default function JobEdit() {
 							onClick={openPropertyModal}
 						/>
 						<div className="mt-2">
-							<MDBBtn color="primary" size="sm" type="button" onClick={openPropertyModal}>
+							<Button color="blue" size="xs" type="button" onClick={openPropertyModal}>
 								Search &amp; Select Property
-							</MDBBtn>
+							</Button>
 						</div>
 					</div>
 
 					<div className="col-md-6 mb-3">
-						<MDBInput
+						<TextInput
 							label="Property Owner Name"
 							name="property_owner_name"
 							type="text"
@@ -875,22 +866,15 @@ export default function JobEdit() {
 
 				<div className="row">
 					<div className="col-12">
-						<MDBBtn color="success" type="submit" disabled={saving}>
+						<Button color="green" type="submit" disabled={saving}>
 							{saving ? 'Saving...' : 'Save Changes'}
-						</MDBBtn>
+						</Button>
 					</div>
 				</div>
 			</form>
 
-			<MDBModal open={propertyModalOpen} setOpen={setPropertyModalOpen} tabIndex='-1'>
-				<MDBModalDialog size='lg' scrollable>
-					<MDBModalContent>
-						<MDBModalHeader>
-							<MDBModalTitle>Select Property</MDBModalTitle>
-							<MDBBtn className='btn-close' color='none' onClick={() => setPropertyModalOpen(false)}></MDBBtn>
-						</MDBModalHeader>
-						<MDBModalBody>
-							<MDBInput
+				<Modal opened={propertyModalOpen} onClose={() => setPropertyModalOpen(false)} size='lg' title="Select Property">
+						<TextInput
 								label="Search property"
 								type="text"
 								value={propertySearch}
@@ -918,25 +902,15 @@ export default function JobEdit() {
 							{!propertiesLoading && !propertiesError && propertiesList.length === 0 && propertySearch.trim() && (
 								<div className="mt-3 text-muted small">No properties found.</div>
 							)}
-						</MDBModalBody>
-						<MDBModalFooter>
-							<MDBBtn color="secondary" onClick={() => setPropertyModalOpen(false)}>
+						<Group justify="flex-end" mt="md">
+							<Button color="gray" onClick={() => setPropertyModalOpen(false)}>
 								Close
-							</MDBBtn>
-						</MDBModalFooter>
-					</MDBModalContent>
-				</MDBModalDialog>
-			</MDBModal>
+							</Button>
+						</Group>
+				</Modal>
 
-			<MDBModal open={applicantModalOpen} setOpen={setApplicantModalOpen} tabIndex='-1'>
-				<MDBModalDialog size='lg' scrollable>
-					<MDBModalContent>
-						<MDBModalHeader>
-							<MDBModalTitle>Select Applicant</MDBModalTitle>
-							<MDBBtn className='btn-close' color='none' onClick={() => setApplicantModalOpen(false)}></MDBBtn>
-						</MDBModalHeader>
-						<MDBModalBody>
-							<MDBInput
+				<Modal opened={applicantModalOpen} onClose={() => setApplicantModalOpen(false)} size='lg' title="Select Applicant">
+						<TextInput
 								label="Search applicant"
 								type="text"
 								value={applicantSearch}
@@ -964,25 +938,15 @@ export default function JobEdit() {
 									)}
 								</div>
 							)}
-						</MDBModalBody>
-						<MDBModalFooter>
-							<MDBBtn color="secondary" onClick={() => setApplicantModalOpen(false)}>
+						<Group justify="flex-end" mt="md">
+							<Button color="gray" onClick={() => setApplicantModalOpen(false)}>
 								Close
-							</MDBBtn>
-						</MDBModalFooter>
-					</MDBModalContent>
-				</MDBModalDialog>
-			</MDBModal>
+							</Button>
+						</Group>
+				</Modal>
 
-			<MDBModal open={contractorModalOpen} setOpen={setContractorModalOpen} tabIndex='-1'>
-				<MDBModalDialog size='lg' scrollable>
-					<MDBModalContent>
-						<MDBModalHeader>
-							<MDBModalTitle>Select Contractor</MDBModalTitle>
-							<MDBBtn className='btn-close' color='none' onClick={() => setContractorModalOpen(false)}></MDBBtn>
-						</MDBModalHeader>
-						<MDBModalBody>
-							<MDBInput
+				<Modal opened={contractorModalOpen} onClose={() => setContractorModalOpen(false)} size='lg' title="Select Contractor">
+						<TextInput
 								label="Search contractor"
 								type="text"
 								value={contractorSearch}
@@ -1013,39 +977,26 @@ export default function JobEdit() {
 									)}
 								</div>
 							)}
-						</MDBModalBody>
-						<MDBModalFooter>
-							<MDBBtn color="secondary" onClick={() => setContractorModalOpen(false)}>
+						<Group justify="flex-end" mt="md">
+							<Button color="gray" onClick={() => setContractorModalOpen(false)}>
 								Close
-							</MDBBtn>
-						</MDBModalFooter>
-					</MDBModalContent>
-				</MDBModalDialog>
-			</MDBModal>
+							</Button>
+						</Group>
+				</Modal>
 
-			<MDBModal open={saveConfirmOpen} setOpen={setSaveConfirmOpen} tabIndex='-1'>
-				<MDBModalDialog size='md'>
-					<MDBModalContent>
-						<MDBModalHeader>
-							<MDBModalTitle>Job Saved</MDBModalTitle>
-							<MDBBtn className='btn-close' color='none' onClick={handleContinueEditing}></MDBBtn>
-						</MDBModalHeader>
-						<MDBModalBody>
-							<p className="mb-0">
-								Job information has been saved successfully. Would you like to return to the preview page or continue editing?
-							</p>
-						</MDBModalBody>
-						<MDBModalFooter>
-							<MDBBtn color="secondary" onClick={handleContinueEditing}>
-								Continue Editing
-							</MDBBtn>
-							<MDBBtn color="primary" onClick={handleReturnToPreview}>
-								Return to Preview
-							</MDBBtn>
-						</MDBModalFooter>
-					</MDBModalContent>
-				</MDBModalDialog>
-			</MDBModal>
+				<Modal opened={saveConfirmOpen} onClose={handleContinueEditing} size='md' title="Job Saved">
+					<Text>
+						Job information has been saved successfully. Would you like to return to the preview page or continue editing?
+					</Text>
+					<Group justify="flex-end" mt="md">
+						<Button color="gray" onClick={handleContinueEditing}>
+							Continue Editing
+						</Button>
+						<Button color="blue" onClick={handleReturnToPreview}>
+							Return to Preview
+						</Button>
+					</Group>
+				</Modal>
 		</div>
 	);
 }

@@ -1,39 +1,51 @@
-import React from 'react'
-import SideNav from '../../Components/Navigation/SideNav'
-import { Outlet, Link } from 'react-router-dom';
-import { MDBContainer, MDBRow, MDBCol, MDBListGroup, MDBListGroupItem } from 'mdb-react-ui-kit';
+import React from 'react';
+import { Outlet, NavLink } from 'react-router-dom';
 
 export default function Dashboard() {
   return (
-    <div>
-      <MDBContainer fluid>
-      <MDBRow>
-        <MDBCol md="2" className="bg-light min-vh-100 p-3">
-          <MDBListGroup>
-            {/* <MDBListGroupItem tag={Link} to="/" action>
-              Home
-            </MDBListGroupItem> */}
-            <MDBListGroupItem tag={Link} to="applicants" action>
+    <div className="container-fluid">
+      <div className="row">
+        <div className="col-12 col-md-2 bg-light min-vh-100 p-3">
+          <ul className="list-group list-group-flush">
+            <NavLink
+              to="applicants"
+              className={({ isActive }) =>
+                'list-group-item list-group-item-action' + (isActive ? ' active' : '')
+              }
+            >
               Applicants
-            </MDBListGroupItem>
-            <MDBListGroupItem tag={Link} to="jobs" action>
+            </NavLink>
+            <NavLink
+              to="jobs"
+              className={({ isActive }) =>
+                'list-group-item list-group-item-action' + (isActive ? ' active' : '')
+              }
+            >
               Job Listings
-            </MDBListGroupItem>
-            <MDBListGroupItem tag={Link} to="settings" action>
+            </NavLink>
+            <NavLink
+              to="settings"
+              className={({ isActive }) =>
+                'list-group-item list-group-item-action' + (isActive ? ' active' : '')
+              }
+            >
               Settings
-            </MDBListGroupItem>
-            <MDBListGroupItem tag={Link} to="profile" action>
+            </NavLink>
+            <NavLink
+              to="profile"
+              className={({ isActive }) =>
+                'list-group-item list-group-item-action' + (isActive ? ' active' : '')
+              }
+            >
               Profile
-            </MDBListGroupItem>
-          </MDBListGroup>
-        </MDBCol>
+            </NavLink>
+          </ul>
+        </div>
 
-        <MDBCol md="10" className="p-4">
+        <div className="col-12 col-md-10 p-4">
           <Outlet />
-        </MDBCol>
-      </MDBRow>
-    </MDBContainer>
-    
+        </div>
+      </div>
     </div>
-  )
+  );
 }
