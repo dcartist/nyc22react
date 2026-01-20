@@ -4,6 +4,7 @@ import { Button, TextInput, Textarea, Checkbox, Select, Modal, Group, Text, Cont
 import Mapgl from '../../../Components/Map_gl';
 import { addJob, getJobStatusMapping, getNewJobNumber, getJobTypes, getAllContractorsShort, getAllApplications, searchProperties } from '../../../services/api';
 
+
 export default function JobsAdd() {
   const location = useLocation();
   const [formData, setFormData] = useState({
@@ -546,9 +547,9 @@ export default function JobsAdd() {
 
   return (
     <>
-    <Container className="mt-4">
+    <Container fluid className="mt-4">
     <Grid className="justify-content-center">
-      <Grid.Col span={{ base: 12, md: 10, lg: 8 }}>
+      <Grid.Col span={12}>
       <Card className="p-4">
         <div className="text-center pb-3 border-bottom mb-4">
         <h2 className="mb-0">Add New Job</h2>
@@ -849,30 +850,32 @@ export default function JobsAdd() {
             readOnly
             />
           </Grid.Col>
+          </Grid>
 
           {/* Property Details & Map */}
           {selectedProperty && (
-            <Grid.Col span={12} className="mb-4">
-            <div className="card">
-              <div className="card-body">
-              <h5 className="card-title mb-3">Property Details</h5>
-              {propertyAddressLine && (
-                <p className="mb-1">
-                <strong>Address:</strong> {propertyAddressLine}
-                {propertyBorough && `, ${propertyBorough}, NY`}
-                </p>
-              )}
-              {propertyOwnerName && (
-                <p className="mb-3">
-                <strong>Owner:</strong> {propertyOwnerName}
-                </p>
-              )}
-              <Mapgl newLocation={propertyMapLocation} />
-              </div>
-            </div>
-            </Grid.Col>
+            <Grid justify="center" className="mb-3">
+              <Grid.Col span={{ base: 12, md: 6 }}>
+                <div className="card">
+                  <div className="card-body">
+                    <h5 className="card-title mb-3">Property Details</h5>
+                    {propertyAddressLine && (
+                      <p className="mb-1">
+                        <strong>Address:</strong> {propertyAddressLine}
+                        {propertyBorough && `, ${propertyBorough}, NY`}
+                      </p>
+                    )}
+                    {propertyOwnerName && (
+                      <p className="mb-3">
+                        <strong>Owner:</strong> {propertyOwnerName}
+                      </p>
+                    )}
+                    <Mapgl newLocation={propertyMapLocation} />
+                  </div>
+                </div>
+              </Grid.Col>
+            </Grid>
           )}
-          </Grid>
 
           {/* Submit Button */}
           <Grid className="mt-4">

@@ -26,12 +26,12 @@ export default function JobDetails() {
     }, [jobId]);
 
     return (
-        <div>
+        <div className='w-75 mx-auto my-4'>
             {error && <div className="alert alert-danger">{error}</div>}
-            {data && ( <div className='d-flex justify-content-center direction-column'>
-                <Container>
+            {data && ( <div className='w-100'>
+                <Container fluid className='px-0'>
                     <Grid className='justify-content-center'>
-                        <Grid.Col span={{ base: 12, md: 8 }}>
+                        <Grid.Col span={12}>
                             <Card className='p-5'>
                                                                 <Card.Section className='d-flex justify-content-between align-items-center px-3 py-2 border-bottom'>
                                                                     <h2 className='mb-0'>Job Information</h2>
@@ -139,9 +139,11 @@ export default function JobDetails() {
                                             <span className='fw-normal'>{data.property ? `${data.property.non_profit}` : 'N/A'}</span>
                                           <div className='fw-bold'>Existing Occupancy: </div><span className='fw-normal'>{data.property ? data.property.existing_occupancy : 'N/A'}</span>
                                         </li>
-                                        <li className='list-group-item'>
+                                        <li className='list-group-item p-0'>
                                            {/* <NYMap newLocation={`${data.property.house_num} ${data.property.street_name}, ${data.property.borough}`} /> */}
-                                             <Mapgl newLocation={`${data.property.house_num} ${data.property.street_name}, ${data.property.borough}`} />
+                                             <div style={{ width: '100%', height: '400px' }}>
+                                               <Mapgl newLocation={`${data.property.house_num} ${data.property.street_name}, ${data.property.borough}`} />
+                                             </div>
                                         </li>
                                        
                                     </ul>
