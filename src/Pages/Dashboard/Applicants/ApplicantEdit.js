@@ -17,7 +17,7 @@ import {
 	MDBModalFooter
 } from 'mdb-react-ui-kit';
 import { useNavigate, useParams } from 'react-router-dom';
-import { editApplicant, getAllJobs, getOneApplication } from '../../../services/api';
+import { editApplicant, getOneApplication, searchJobs } from '../../../services/api';
 import Mapgl from '../../../Components/Map_gl';
 
 export default function ApplicantEdit() {
@@ -33,9 +33,11 @@ export default function ApplicantEdit() {
 	});
 
 	const [allJobs, setAllJobs] = useState([]);
+	const [linkedJobsData, setLinkedJobsData] = useState([]);
 	const [jobsLoading, setJobsLoading] = useState(false);
 	const [jobsError, setJobsError] = useState('');
 	const [loading, setLoading] = useState(true);
+	const [searchTimeout, setSearchTimeout] = useState(null);
 	const [saving, setSaving] = useState(false);
 	const [error, setError] = useState('');
 	const [success, setSuccess] = useState('');
@@ -60,6 +62,12 @@ export default function ApplicantEdit() {
 		if (!id) return;
 		setFormData(prev => {
 			const exists = prev.jobs.includes(id);
+			// Update linkedJobsData to reflect the change
+			if (exists) {
+				setLinkedJobsData(prevLinked => prevLinked.filter(j => getJobId(j) !== id));
+			} else {
+				setLinkedJobsData(prevLinked => [...prevLinked, job]);
+			}
 			return {
 				...prev,
 				jobs: exists
@@ -129,7 +137,8 @@ export default function ApplicantEdit() {
 				const existingJobs = Array.isArray(application.job_listing)
 					? application.job_listing
 					: [];
-
+			// Store linked jobs for display
+			setLinkedJobsData(existingJobs.filter(j => typeof j === 'object'));
 				setFormData(prev => ({
 					...prev,
 					applicant_firstName: application.applicant_firstName || '',
@@ -141,16 +150,7 @@ export default function ApplicantEdit() {
 						.filter(Boolean)
 				}));
 
-				setJobsLoading(true);
-				try {
-					const jobs = await getAllJobs();
-					setAllJobs(Array.isArray(jobs) ? jobs : []);
-				} catch (e) {
-					console.error('Failed to load jobs for applicant edit', e);
-					setJobsError('Failed to load jobs');
-				} finally {
-					setJobsLoading(false);
-				}
+				// Jobs will be loaded when user searches
 			} catch (e) {
 				console.error('Failed to load applicant for editing', e);
 				setError('Failed to load applicant for editing');
@@ -160,27 +160,40 @@ export default function ApplicantEdit() {
 		})();
 	}, [applicantId]);
 
-	const linkedJobs = allJobs.filter(job => {
-		const id = getJobId(job);
-		return id && formData.jobs.includes(id);
-	});
+	const linkedJobs = linkedJobsData;
 
-	const filteredJobs = allJobs.filter(job => {
-		if (!jobSearchTerm) return true;
-		const term = jobSearchTerm.toLowerCase();
-		const number = job.job_number ? String(job.job_number).toLowerCase() : '';
-		const borough = job.property?.borough ? String(job.property.borough).toLowerCase() : '';
-		const street = job.property?.street_name ? String(job.property.street_name).toLowerCase() : '';
-		const house = job.property?.house_num ? String(job.property.house_num).toLowerCase() : '';
-		const desc = job.job_description ? String(job.job_description).toLowerCase() : '';
-		return (
-			number.includes(term) ||
-			borough.includes(term) ||
-			street.includes(term) ||
-			house.includes(term) ||
-			desc.includes(term)
-		);
-	});
+	const handleJobSearch = async (searchTerm) => {
+		setJobSearchTerm(searchTerm);
+		
+		if (searchTimeout) {
+			clearTimeout(searchTimeout);
+		}
+
+		if (!searchTerm.trim()) {
+			setAllJobs([]);
+			setJobsError('');
+			return;
+		}
+
+		const timeout = setTimeout(async () => {
+			setJobsLoading(true);
+			setJobsError('');
+			try {
+				const jobs = await searchJobs(searchTerm);
+				setAllJobs(Array.isArray(jobs) ? jobs : []);
+			} catch (e) {
+				console.error('Failed to search jobs', e);
+				setJobsError('Failed to search jobs');
+				setAllJobs([]);
+			} finally {
+				setJobsLoading(false);
+			}
+		}, 500);
+
+		setSearchTimeout(timeout);
+	};
+
+	const filteredJobs = allJobs;
 
 	if (loading) {
 		return (
@@ -320,13 +333,18 @@ export default function ApplicantEdit() {
 								label="Search jobs by number, address, borough, or description"
 								type="text"
 								value={jobSearchTerm}
-								onChange={(e) => setJobSearchTerm(e.target.value)}
+								onChange={(e) => handleJobSearch(e.target.value)}
 								size="sm"
 							/>
 						</div>
-						{!jobsLoading && !jobsError && allJobs.length === 0 && (
-							<p className="text-muted">No jobs available.</p>
+						{jobsLoading && <p className="text-muted">Searching jobs...</p>}
+						{!jobsLoading && !jobsError && allJobs.length === 0 && !jobSearchTerm && (
+							<p className="text-muted">Start typing to search for jobs.</p>
 						)}
+						{!jobsLoading && !jobsError && allJobs.length === 0 && jobSearchTerm && (
+							<p className="text-muted">No jobs found matching your search.</p>
+						)}
+						{jobsError && <p className="text-danger">{jobsError}</p>}
 						{!jobsLoading && !jobsError && filteredJobs.length > 0 && (
 							<div className="list-group" style={{ maxHeight: '300px', overflowY: 'auto' }}>
 								{filteredJobs.map((job) => {
@@ -349,9 +367,7 @@ export default function ApplicantEdit() {
 								})}
 							</div>
 						)}
-						{!jobsLoading && !jobsError && allJobs.length > 0 && filteredJobs.length === 0 && (
-							<p className="text-muted">No jobs match your search.</p>
-						)}
+
 						<small className="text-muted d-block mt-1">
 							Click a job in the list below to add or remove it from this applicant. This does not change the applicant number.
 						</small>
