@@ -9,17 +9,17 @@ import {
   MDBNavbarNav,
   MDBNavbarToggler
 } from 'mdb-react-ui-kit';
-
+import logo from '../Images/nyclogo.png'
 import { useState } from 'react';
 
 export default function Navigation() {
   const [openNavText, setOpenNavText] = useState(false);
-  return (<MDBNavbar expand='lg' light bgColor='light'>
+  return (<MDBNavbar expand='lg' light bgColor='light' >
     <MDBContainer fluid>
-      <MDBNavbarBrand href='/'>NYC Job Portal</MDBNavbarBrand>
+      <MDBNavbarBrand href='/'> <img src={logo} alt="NYC Job Portal" style={{ height: '40px' }} /> NYC Contstruction Job Portal</MDBNavbarBrand>
       <MDBNavbarToggler
-        type='button'
-        data-target='#navbarText'
+          type='button'
+          data-target='#navbarText'
         aria-controls='navbarText'
         aria-expanded='false'
         aria-label='Toggle navigation'
