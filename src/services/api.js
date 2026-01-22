@@ -2,6 +2,19 @@ import axios from "axios";
 
 const API_BASE = process.env.REACT_APP_API_URL || process.env.REACT_APP_API_URL_DEV;
 
+export const apiPing = async () => {
+    try {
+        const res = await axios.get(`${API_BASE}`);
+        if (res.status === 200) {
+            console.log("API is reachable:", res.data);
+        } else {
+            console.error("API ping failed with status:", res.status);
+        }
+    } catch (error) {
+        console.error("Error pinging API:", error);
+    }
+}
+
 // ANCHOR: Get All Applications
 export const getAllApplications = async () => {
     const res = await axios.get(`${API_BASE}/applications`);
