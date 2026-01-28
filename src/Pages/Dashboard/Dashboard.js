@@ -19,12 +19,12 @@ export default function Dashboard() {
             <MDBListGroupItem tag={Link} to="jobs" action>
               Job Listings
             </MDBListGroupItem>
-            <MDBListGroupItem tag={Link} to="settings" action>
+            {/* <MDBListGroupItem tag={Link} to="settings" action>
               Settings
             </MDBListGroupItem>
             <MDBListGroupItem tag={Link} to="profile" action>
               Profile
-            </MDBListGroupItem>
+            </MDBListGroupItem> */}
           </MDBListGroup>
         </MDBCol>
 
