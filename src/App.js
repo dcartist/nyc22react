@@ -12,6 +12,10 @@ import ApplicantEdit from "./Pages/Dashboard/Applicants/ApplicantEdit";
 import Billing from "./Pages/Dashboard/Billing";
 import Dashboard from "./Pages/Dashboard/Dashboard";
 import Home from "./Pages/Home";
+import Contractors from "./Pages/Dashboard/Contractor/Contractors";
+import ContractorAdd from "./Pages/Dashboard/Contractor/ContractorAdd";
+import ContractorDetails from "./Pages/Dashboard/Contractor/ContractorDetails";
+import ContractorEdit from "./Pages/Dashboard/Contractor/ContractorEdit";
 import JobsAdd from "./Pages/Dashboard/Jobs/JobsAdd";
 import JobDetails from "./Pages/Dashboard/Jobs/JobDetails";
 import JobEdit from "./Pages/Dashboard/Jobs/JobEdit";
@@ -57,6 +61,15 @@ function App() {
                     <Route path="add" element={<JobsAdd />} />
                     <Route path=":jobId" element={<JobDetails />} />
                     <Route path=":jobId/edit" element={<JobEdit />} />
+                  </Route>
+                  <Route path="contractors" >
+                    <Route index element={<Contractors />} />
+                    <Route path=":contractorId/edit" element={<ContractorEdit />} />
+                    <Route path=":contractorId" element={<ContractorDetails />} />
+                    <Route path="add" element={<ContractorAdd />} />
+                    {/* <Route index element={<Navigate to="list" replace />} /> */}
+                    {/* <Route path="list" element={<Jobs />} /> */}
+                    {/* Additional contractor routes can be added here */}
                   </Route>
                   <Route path="profile" element={<Profile />} />
                   <Route path="settings" element={<SettingsLayout />}>
