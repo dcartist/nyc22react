@@ -2,6 +2,19 @@ import axios from "axios";
 
 const API_BASE = process.env.REACT_APP_API_URL || process.env.REACT_APP_API_URL_DEV;
 
+export const apiPing = async () => {
+    try {
+        const res = await axios.get(`${API_BASE}`);
+        if (res.status === 200) {
+            console.log("API is reachable:", res.data);
+        } else {
+            console.error("API ping failed with status:", res.status);
+        }
+    } catch (error) {
+        console.error("Error pinging API:", error);
+    }
+}
+
 // ANCHOR: Get All Applications
 export const getAllApplications = async () => {
     const res = await axios.get(`${API_BASE}/applications`);
@@ -219,3 +232,62 @@ export const getNewApplicationNumber = async () => {
     console.log("New application number fetched successfully:", res.data);
     return res.data.new_application_number;
 }
+
+// ANCHOR: Get one contractor by ID
+export const getOneContractor = async (id) => {
+    const res = await axios.get(`${API_BASE}/contractors/id/${id}`);
+    console.log("Fetching contractor with ID:", id);
+    console.log("API URL:", `${API_BASE}/contractors/id/${id}`);
+    if (res.status !== 200) throw new Error("Failed to fetch contractor");
+    console.log("Contractor fetched successfully:", res.data);
+    return res.data;
+};
+
+// ANCHOR: Add new contractor
+export const addContractor = async (contractorData) => {
+    const response = await fetch(`${API_BASE}/contractors/add`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(contractorData)
+    });
+    if (!response.ok) throw response;
+    return response.json();
+};
+
+// ANCHOR: Edit existing contractor
+export const editContractor = async (id, contractorData) => {
+    console.log("Editing contractor with ID:", id);
+    console.log("Contractor data to update:", contractorData);
+    const response = await fetch(`${API_BASE}/contractors/edit/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(contractorData)
+    });
+    if (!response.ok) throw response;
+    console.log(contractorData)
+    return response.json();
+};
+
+// ANCHOR: Get new contractor number
+export const getNewContractorNumber = async () => {
+    const res = await axios.get(`${API_BASE}/contractors/newNumber`);
+    if (res.status !== 200) throw new Error("Failed to fetch new contractor number");
+    console.log("New contractor number fetched successfully:", res.data);
+    return res.data.new_contractor_number || res.data;
+};
+
+// ANCHOR: Get license types
+export const getLicenseTypes = async () => {
+    const res = await axios.get(`${API_BASE}/contractors/license/types`);
+    if (res.status !== 200) throw new Error("Failed to fetch license types");
+    console.log("License types fetched successfully:", res.data);
+    return res.data;
+};
+
+// ANCHOR: Get license statuses
+export const getLicenseStatuses = async () => {
+    const res = await axios.get(`${API_BASE}/contractors/license/status`);
+    if (res.status !== 200) throw new Error("Failed to fetch license statuses");
+    console.log("License statuses fetched successfully:", res.data);
+    return res.data;
+};
