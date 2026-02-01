@@ -65,13 +65,6 @@ export default function JobsTablePagination({
       cellClass: p => p.value ? 'text-success fw-bold' : 'text-danger fw-bold'
     },
     { headerName: "Job Status", field: "job_status_descrp", filter: true, sortable: true },
-    {
-      headerName: "Borough",
-      field: "property.borough",
-      filter: true,
-      sortable: true,
-      valueGetter: p => p.data?.property?.borough || ''
-    }
   ]), []);
 
   const defaultColDef = { flex: 1 };
