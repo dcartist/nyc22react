@@ -99,7 +99,7 @@ export default function Contractors() {
           )}
         </form>
 
-        <Link to="/dashboard/contractors/new" className="btn btn-success ms-auto">
+        <Link to="/dashboard/contractors/add" className="btn btn-success ms-auto">
           Create New Contractor
         </Link>
       </div>
