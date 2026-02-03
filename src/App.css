@@ -32,6 +32,12 @@
   color: #61dafb;
 }
 
+.btn-close-black {
+  filter: none !important;  
+  opacity: 1;
+}
+
+
 /* Sidebar: min-vh-100 only on md and up */
 @media (min-width: 768px) {
   .min-vh-md-100 {

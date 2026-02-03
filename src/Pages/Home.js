@@ -14,6 +14,7 @@ export default function Home() {
        <MDBToast
         color='warning'
         open={isOpen}
+       closeBtnClasses='btn-close btn-close-black'
         onClose={() => setIsOpen(false)}
         // autohide
         position='top-left'
@@ -23,12 +24,12 @@ export default function Home() {
           <>
             <strong className='me-auto'>Under Construction</strong>
             <small></small>
-            <button
+            {/* <button
               type='button'
-              className='btn-close'
+              className='btn-close '
               onClick={() => setIsOpen(false)}
               aria-label='Close'
-            ></button>
+            ></button> */}
           </>
         }
         bodyContent='This website is still being developed. It is a work in progress.'
