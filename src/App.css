@@ -32,6 +32,13 @@
   color: #61dafb;
 }
 
+/* Sidebar: min-vh-100 only on md and up */
+@media (min-width: 768px) {
+  .min-vh-md-100 {
+    min-height: 100vh;
+  }
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);

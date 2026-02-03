@@ -8,7 +8,7 @@ export default function Dashboard() {
     <div>
       <MDBContainer fluid>
       <MDBRow>
-        <MDBCol md="2" className="bg-light min-vh-100 p-3">
+        <MDBCol md="2" className="bg-light min-vh-md-100  p-3">
           <MDBListGroup>
             {/* <MDBListGroupItem tag={Link} to="/" action>
               Home
