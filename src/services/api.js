@@ -233,6 +233,10 @@ export const getNewApplicationNumber = async () => {
     return res.data.new_application_number;
 }
 
+
+
+
+
 // ANCHOR: Get one contractor by ID
 export const getOneContractor = async (id) => {
     const res = await axios.get(`${API_BASE}/contractors/id/${id}`);
