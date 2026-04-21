@@ -1,3 +1,9 @@
+const uid = () => {
+  const ts = Math.floor(Date.now() / 1000).toString(16).padStart(8, '0')
+  const rand = () => Math.floor(Math.random() * 0xffffffff).toString(16).padStart(8, '0')
+  return (ts + rand() + rand()).slice(0, 24)
+}
+
 const SAMPLE_CONTRACTORS = [
   {
     first_name: 'Alice',
@@ -64,5 +70,55 @@ describe('Contractors', () => {
     cy.contains('button', 'Clear').click()
     cy.contains('button', 'Clear').should('not.exist')
     cy.get('input[placeholder*="Search contractors"]').should('have.value', '')
+  })
+})
+
+describe('Add contractor with random name', () => {
+  let firstName
+  let lastName
+
+  before(() => {
+    firstName = `Test${uid()}`
+    lastName = `Ctr${uid()}`
+  })
+
+  beforeEach(() => {
+    cy.intercept('GET', '**/api/v2/contractors/newNumber', {
+      body: { new_contractor_number: 'C-TEST-001' },
+    }).as('getContractorNumber')
+    cy.intercept('GET', '**/api/v2/contractors/license/types', {
+      body: ['General Contractor', 'Subcontractor', 'Electrician'],
+    }).as('getLicenseTypes')
+    cy.intercept('GET', '**/api/v2/contractors/license/status', {
+      body: ['Active', 'Inactive', 'Suspended'],
+    }).as('getLicenseStatuses')
+
+    cy.visit('/dashboard/contractors/add')
+    cy.wait(['@getContractorNumber', '@getLicenseTypes', '@getLicenseStatuses'])
+  })
+
+  it('fills the form with a random name, submits, and finds the name in the list', () => {
+    cy.intercept('POST', '**/api/v2/contractors/add', {
+      statusCode: 201,
+      body: { first_name: firstName, last_name: lastName, license_type: 'General Contractor', license_number: 'C-TEST-001' },
+    }).as('addContractor')
+
+    cy.intercept('GET', '**/api/v2/contractors', {
+      body: [{ first_name: firstName, last_name: lastName, license_type: 'General Contractor', license_number: 'C-TEST-001' }],
+    }).as('getContractors')
+
+    cy.get('input[name="first_name"]').type(firstName)
+    cy.get('input[name="last_name"]').type(lastName)
+    cy.get('select[name="license_type"]').select('General Contractor')
+
+    cy.contains('button', 'Create Contractor').click()
+    cy.wait('@addContractor')
+
+    cy.contains('Contractor created successfully!').should('be.visible')
+
+    cy.wait('@getContractors', { timeout: 5000 })
+    cy.url().should('include', '/dashboard/contractors')
+    cy.contains(firstName).should('be.visible')
+    cy.contains(lastName).should('be.visible')
   })
 })
